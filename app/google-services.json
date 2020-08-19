@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1012032823686",
+    "firebase_url": "https://labaffinity-3f75c.firebaseio.com",
+    "project_id": "labaffinity-3f75c",
+    "storage_bucket": "labaffinity-3f75c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012032823686:android:de46c1bd2db18425",
+        "android_client_info": {
+          "package_name": "com.snail.labaffinity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1012032823686-dc79a79gd0c5pksh6993k7a62dk6k0n7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.snail.labaffinity",
+            "certificate_hash": "cea4da8f6a541a140a6a64e08604bc07f87364f4"
+          }
+        },
+        {
+          "client_id": "1012032823686-b3gkava655j7ch0ppc12rjfk2g66tmcp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCd7F0BkgeeZMxJpWT-NQQ2nrlns2K28mo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1012032823686-b3gkava655j7ch0ppc12rjfk2g66tmcp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
