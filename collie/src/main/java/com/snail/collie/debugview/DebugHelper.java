@@ -34,6 +34,9 @@ public class DebugHelper {
     }
 
     public void show(final Context context) {
+        if (mFloatHelper != null && mFloatHelper.isShowing()) {
+            return;
+        }
         if (mDebugCollieView == null) {
             mDebugCollieView = new FloatingFpsView(context);
             mFloatHelper = new FloatHelper(context);
@@ -60,11 +63,13 @@ public class DebugHelper {
 
     public void update(final String content) {
 
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mDebugCollieView.update(content);
-            }
-        });
+        if (mFloatHelper != null && mFloatHelper.isShowing()) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mDebugCollieView.update(content);
+                }
+            });
+        }
     }
 }

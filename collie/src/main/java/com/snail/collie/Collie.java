@@ -13,7 +13,9 @@ import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.debugview.DebugHelper;
 import com.snail.collie.fps.FpsTracker;
-import com.snail.collie.fps.ITrackListener;
+import com.snail.collie.fps.ITrackFpsListener;
+import com.snail.collie.trafficstats.ITrackTrafficStatsListener;
+import com.snail.collie.trafficstats.TrafficStatsTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,15 +24,16 @@ public class Collie {
 
     private static volatile Collie sInstance = null;
     private Handler mHandler;
-    private ITrackListener mITrackListener;
+    private ITrackFpsListener mITrackListener;
+    private ITrackTrafficStatsListener mTrackTrafficStatsListener;
 
     private Collie() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
-        mITrackListener = new ITrackListener() {
+        mITrackListener = new ITrackFpsListener() {
             @Override
             public void onHandlerMessageCost(final long currentCostMils, final long currentDropFrame, final boolean isInFrameDraw, final long averageFps) {
                 final long currentFps = currentCostMils == 0 ? 60 : Math.min(60, 1000 / currentCostMils);
-                Log.v("Collie", "实时帧率 " + currentFps + " 掉帧 " + currentDropFrame + " 1S平均帧率 " + averageFps + " 本次耗时 " + currentCostMils);
+//                Log.v("Collie", "实时帧率 " + currentFps + " 掉帧 " + currentDropFrame + " 1S平均帧率 " + averageFps + " 本次耗时 " + currentCostMils);
                 mHandler.post(new Runnable() {
 
 
@@ -50,6 +53,13 @@ public class Collie {
                     }
 
                 });
+            }
+        };
+
+        mTrackTrafficStatsListener = new ITrackTrafficStatsListener() {
+            @Override
+            public void onTrafficStats(String activityName, long value) {
+                Log.v("Collie", "" + activityName + " 流量消耗 " + value*1.0f/(1024*1024)+"M");
             }
         };
     }
@@ -76,6 +86,7 @@ public class Collie {
         @Override
         public void onActivityStarted(@NonNull final Activity activity) {
             FpsTracker.getInstance().addTrackerListener(mITrackListener);
+            TrafficStatsTracker.getInstance().markActivityStart(activity);
         }
 
         @Override
@@ -85,18 +96,19 @@ public class Collie {
 
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
-
+            TrafficStatsTracker.getInstance().markActivityPause(activity);
         }
 
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
             //   只针对TOP Activity
-            if (activity == ActivityStack.getInstance().getTopActivity()) {
+            if (ActivityStack.getInstance().getTopActivity() == ActivityStack.getInstance().getBottomActivity()) {
                 FpsTracker.getInstance().stopTracker();
                 if (BuildConfig.DEBUG) {
                     DebugHelper.getInstance().hide();
                 }
             }
+
         }
 
         @Override
@@ -107,11 +119,14 @@ public class Collie {
         @Override
         public void onActivityDestroyed(@NonNull Activity activity) {
             ActivityStack.getInstance().pop(activity);
+            TrafficStatsTracker.getInstance().markActivityDestroy(activity);
+
         }
     };
 
     public void init(@NonNull Application application, final CollieListener listener) {
         application.registerActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
+        TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
         mCollieListeners.add(listener);
     }
 

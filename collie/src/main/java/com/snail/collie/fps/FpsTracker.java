@@ -17,18 +17,18 @@ import java.util.List;
 
 public class FpsTracker extends LooperMonitor.LooperDispatchListener {
 
-    private List<ITrackListener> mITrackListeners = new ArrayList<>();
+    private List<ITrackFpsListener> mITrackListeners = new ArrayList<>();
     private Handler mHandler;
     private HashMap<Activity, CollectItem> mActivityCollectItemHashMap = new HashMap<>();
     private long mStartTime;
     private static volatile FpsTracker sInstance = null;
 
-    public void addTrackerListener(ITrackListener listener) {
+    public void addTrackerListener(ITrackFpsListener listener) {
 
         mITrackListeners.add(listener);
     }
 
-    public void removeTrackerListener(ITrackListener listener) {
+    public void removeTrackerListener(ITrackFpsListener listener) {
 
         mITrackListeners.remove(listener);
     }
@@ -131,7 +131,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener {
                     collectItem.sumCost += Math.max(16, cost);
                     collectItem.sumFrame++;
 
-                    for (ITrackListener item : mITrackListeners) {
+                    for (ITrackFpsListener item : mITrackListeners) {
                         if (collectItem.sumFrame > 10) {
                             long averageFps = Math.min(60, collectItem.sumCost > 0 ? collectItem.sumFrame * 1000 / collectItem.sumCost : 60);
                             item.onHandlerMessageCost(cost, cost <= 16 ? 0 : Math.max(1, cost / 16 - 1), inDoFrame, averageFps);

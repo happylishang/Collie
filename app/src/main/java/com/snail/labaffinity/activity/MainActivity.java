@@ -26,15 +26,15 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                CrashReport.testJavaCrash();
-//                CrashReport.testANRCrash();
+
             }
         });
         mResultProfileBinding.contentMain1.second.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent mIntent=new Intent( MainActivity.this, TrafficTestActivity.class);
+                startActivity(mIntent);
 
-                CrashReport.testNativeCrash();
             }
         });
         mResultProfileBinding.contentMain1.third.setOnClickListener(new View.OnClickListener() {
@@ -42,14 +42,6 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-
-                FirebaseAnalytics.getInstance(getApplicationContext()).setUserProperty("versionCode", Integer.toString(BuildConfig.VERSION_CODE));
-
-                Bundle bundle = new Bundle();
-                bundle.putString("platform", "android");
-                FirebaseAnalytics.getInstance(getApplicationContext()).logEvent("androidLaunch", bundle);
-
-                FirebaseAnalytics.getInstance(getApplicationContext()).logEvent("user_engagement", null);
                 Intent mIntent=new Intent(MainActivity.this, FpsTestActivity.class);
                 startActivity(mIntent);
             }

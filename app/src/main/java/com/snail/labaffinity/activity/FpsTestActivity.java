@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.snail.collie.Collie;
 import com.snail.labaffinity.databinding.ActivitySecondBinding;
 import com.snail.labaffinity.utils.LogUtils;
 
@@ -23,7 +24,7 @@ public class FpsTestActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Collie.getInstance().showDebugView(this);
         getWindow().getDecorView().getViewTreeObserver().addOnTouchModeChangeListener(new ViewTreeObserver.OnTouchModeChangeListener() {
             @Override
             public void onTouchModeChanged(boolean isInTouchMode) {
@@ -49,7 +50,7 @@ public class FpsTestActivity extends BaseActivity {
 
             @Override
             public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-                LogUtils.v("位置 " + position);
+//                LogUtils.v("位置 " + position);
                 if (position > 10)
                     SystemClock.sleep(50);
                 ((TextView) holder.itemView).setHeight(500);

@@ -31,12 +31,12 @@
                 android:id="@+id/second"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="native"/>
+                android:text="测试流量"/>
             <Button
                 android:id="@+id/third"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="firebase"/>
+                android:text="测试帧率"/>
         </LinearLayout>
     </ScrollView>
 

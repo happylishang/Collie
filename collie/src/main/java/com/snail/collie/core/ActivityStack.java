@@ -37,4 +37,9 @@ import java.util.List;
 
         return mActivities.size() > 0 ? mActivities.get(0) : null;
     }
+
+     public Activity getBottomActivity() {
+
+         return mActivities.size() > 0 ? mActivities.get(mActivities.size() - 1) : null;
+     }
 }
