@@ -76,9 +76,6 @@ public class Collie {
         @Override
         public void onActivityStarted(@NonNull final Activity activity) {
             FpsTracker.getInstance().addTrackerListener(mITrackListener);
-            if(BuildConfig.DEBUG){
-                DebugHelper.getInstance().show(activity);
-            }
         }
 
         @Override
@@ -96,7 +93,7 @@ public class Collie {
             //   只针对TOP Activity
             if (activity == ActivityStack.getInstance().getTopActivity()) {
                 FpsTracker.getInstance().stopTracker();
-                if(BuildConfig.DEBUG){
+                if (BuildConfig.DEBUG) {
                     DebugHelper.getInstance().hide();
                 }
             }
@@ -116,6 +113,12 @@ public class Collie {
     public void init(@NonNull Application application, final CollieListener listener) {
         application.registerActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
         mCollieListeners.add(listener);
+    }
+
+    public void showDebugView(Activity activity) {
+        if (BuildConfig.DEBUG) {
+            DebugHelper.getInstance().show(activity);
+        }
     }
 
     public void registerCollieListener(CollieListener listener) {
