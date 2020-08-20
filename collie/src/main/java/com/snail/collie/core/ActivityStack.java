@@ -5,11 +5,12 @@ import android.app.Activity;
 import java.util.ArrayList;
 import java.util.List;
 
- public class ActivityStack {
+public class ActivityStack {
 
     private static volatile ActivityStack sInstance = null;
 
     private List<Activity> mActivities = new ArrayList<>();
+    private boolean isInBackGround;
 
     private ActivityStack() {
     }
@@ -33,13 +34,25 @@ import java.util.List;
         mActivities.remove(activity);
     }
 
+    public void markResume() {
+        isInBackGround = false;
+    }
+
+    public void markStop() {
+        isInBackGround = getTopActivity() == getBottomActivity();
+    }
+
     public Activity getTopActivity() {
 
         return mActivities.size() > 0 ? mActivities.get(0) : null;
     }
 
-     public Activity getBottomActivity() {
+    public Activity getBottomActivity() {
 
-         return mActivities.size() > 0 ? mActivities.get(mActivities.size() - 1) : null;
-     }
+        return mActivities.size() > 0 ? mActivities.get(mActivities.size() - 1) : null;
+    }
+
+    public boolean isInBackGround() {
+        return isInBackGround;
+    }
 }
