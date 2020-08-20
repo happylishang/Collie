@@ -5,26 +5,33 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.view.Choreographer;
 
+import androidx.annotation.NonNull;
+
+import com.snail.collie.BuildConfig;
+import com.snail.collie.Collie;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
+import com.snail.collie.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
+import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
+import com.snail.collie.debug.DebugHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
-public class FpsTracker extends LooperMonitor.LooperDispatchListener {
+public class FpsTracker extends LooperMonitor.LooperDispatchListener implements ITracker {
 
-    private List<ITrackFpsListener> mITrackListeners = new ArrayList<>();
+    private HashSet<ITrackFpsListener> mITrackListeners = new HashSet<>();
     private Handler mHandler;
     private HashMap<Activity, CollectItem> mActivityCollectItemHashMap = new HashMap<>();
     private long mStartTime;
     private static volatile FpsTracker sInstance = null;
 
     public void addTrackerListener(ITrackFpsListener listener) {
-
         mITrackListeners.add(listener);
     }
 
@@ -36,6 +43,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener {
 
     private FpsTracker() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+        Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
     }
 
     public static FpsTracker getInstance() {
@@ -61,20 +69,27 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener {
     public static final int CALLBACK_TRAVERSAL = 2;
     private static final String ADD_CALLBACK = "addCallbackLocked";
     private boolean mInDoFrame = false;
+    private SimpleActivityLifecycleCallbacks mSimpleActivityLifecycleCallbacks = new SimpleActivityLifecycleCallbacks() {
 
-    public void startTracker() {
-        if (choreographer == null) {
-            choreographer = Choreographer.getInstance();
-            callbackQueueLock = reflectObject(choreographer, "mLock");
-            callbackQueues = reflectObject(choreographer, "mCallbackQueues");
-            frameIntervalNanos = reflectObject(choreographer, "mFrameIntervalNanos");
-            addInputQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_INPUT], ADD_CALLBACK, long.class, Object.class, Object.class);
-            addAnimationQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_ANIMATION], ADD_CALLBACK, long.class, Object.class, Object.class);
-            addTraversalQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_TRAVERSAL], ADD_CALLBACK, long.class, Object.class, Object.class);
+        @Override
+        public void onActivityPaused(@NonNull Activity activity) {
+            super.onActivityPaused(activity);
+            FpsTracker.getInstance().pauseTrack();
+            //   只针对TOP Activity
+            if (ActivityStack.getInstance().getTopActivity() == ActivityStack.getInstance().getBottomActivity()) {
+                if (BuildConfig.DEBUG) {
+                    DebugHelper.getInstance().hide();
+                }
+            }
         }
-        LooperMonitor.register(this);
-        addFrameCallBack();
-    }
+
+        @Override
+        public void onActivityResumed(@NonNull Activity activity) {
+            super.onActivityResumed(activity);
+            startTrack();
+        }
+    };
+
 
     @Override
     public boolean isValid() {
@@ -146,11 +161,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener {
         });
     }
 
-    public void stopTracker() {
-        LooperMonitor.unregister(this);
-        mITrackListeners.clear();
-        mStartTime = 0;
-    }
 
     public long getFrameIntervalNanos() {
         return frameIntervalNanos;
@@ -208,5 +218,33 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener {
         } catch (Exception ignored) {
 
         }
+    }
+
+    @Override
+    public void destroy() {
+        Collie.getInstance().removeActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
+        sInstance = null;
+    }
+
+    @Override
+    public void startTrack() {
+        if (choreographer == null) {
+            choreographer = Choreographer.getInstance();
+            callbackQueueLock = reflectObject(choreographer, "mLock");
+            callbackQueues = reflectObject(choreographer, "mCallbackQueues");
+            frameIntervalNanos = reflectObject(choreographer, "mFrameIntervalNanos");
+            addInputQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_INPUT], ADD_CALLBACK, long.class, Object.class, Object.class);
+            addAnimationQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_ANIMATION], ADD_CALLBACK, long.class, Object.class, Object.class);
+            addTraversalQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_TRAVERSAL], ADD_CALLBACK, long.class, Object.class, Object.class);
+        }
+        LooperMonitor.register(this);
+        addFrameCallBack();
+    }
+
+    @Override
+    public void pauseTrack() {
+        LooperMonitor.unregister(this);
+        mITrackListeners.clear();
+        mStartTime = 0;
     }
 }

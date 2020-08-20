@@ -18,6 +18,7 @@ import com.snail.collie.trafficstats.ITrackTrafficStatsListener;
 import com.snail.collie.trafficstats.TrafficStatsTracker;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class Collie {
@@ -26,6 +27,9 @@ public class Collie {
     private Handler mHandler;
     private ITrackFpsListener mITrackListener;
     private ITrackTrafficStatsListener mTrackTrafficStatsListener;
+
+    private List<CollieListener> mCollieListeners = new ArrayList<>();
+    private HashSet<Application.ActivityLifecycleCallbacks> mActivityLifecycleCallbacks=new HashSet<>();
 
     private Collie() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
@@ -75,57 +79,71 @@ public class Collie {
         return sInstance;
     }
 
-    private List<CollieListener> mCollieListeners = new ArrayList<>();
+    public void addActivityLifecycleCallbacks(Application.ActivityLifecycleCallbacks callbacks){
+        mActivityLifecycleCallbacks.add(callbacks);
+    }
 
-    private Application.ActivityLifecycleCallbacks mActivityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
+    public void removeActivityLifecycleCallbacks(Application.ActivityLifecycleCallbacks callbacks){
+        mActivityLifecycleCallbacks.remove(callbacks);
+    }
+
+    private Application.ActivityLifecycleCallbacks mActivityLifecycleCallback = new Application.ActivityLifecycleCallbacks() {
         @Override
         public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle bundle) {
             ActivityStack.getInstance().push(activity);
+            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
+                item.onActivityCreated(activity,bundle);
+            }
         }
 
         @Override
         public void onActivityStarted(@NonNull final Activity activity) {
+
+            for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
+                item.onActivityStarted(activity);
+            }
             FpsTracker.getInstance().addTrackerListener(mITrackListener);
-            TrafficStatsTracker.getInstance().markActivityStart(activity);
         }
 
         @Override
         public void onActivityResumed(@NonNull Activity activity) {
-            FpsTracker.getInstance().startTracker();
+            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
+                item.onActivityResumed(activity);
+            }
         }
 
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
-            TrafficStatsTracker.getInstance().markActivityPause(activity);
+            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
+                item.onActivityPaused(activity);
+            }
         }
 
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
-            //   只针对TOP Activity
-            if (ActivityStack.getInstance().getTopActivity() == ActivityStack.getInstance().getBottomActivity()) {
-                FpsTracker.getInstance().stopTracker();
-                if (BuildConfig.DEBUG) {
-                    DebugHelper.getInstance().hide();
-                }
+            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
+                item.onActivityStopped(activity);
             }
-
         }
 
         @Override
         public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle bundle) {
-
+            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
+                item.onActivitySaveInstanceState(activity,bundle);
+            }
         }
 
         @Override
         public void onActivityDestroyed(@NonNull Activity activity) {
+            for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
+                item.onActivityDestroyed(activity);
+            }
             ActivityStack.getInstance().pop(activity);
-            TrafficStatsTracker.getInstance().markActivityDestroy(activity);
-
         }
     };
 
     public void init(@NonNull Application application, final CollieListener listener) {
-        application.registerActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
+        application.registerActivityLifecycleCallbacks(mActivityLifecycleCallback);
         TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
         mCollieListeners.add(listener);
     }
@@ -145,7 +163,7 @@ public class Collie {
     }
 
     public void stop(@NonNull Application application) {
-        application.unregisterActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
+        application.unregisterActivityLifecycleCallbacks(mActivityLifecycleCallback);
         CollieHandlerThread.getInstance().getHandlerThread().quitSafely();
     }
 }
