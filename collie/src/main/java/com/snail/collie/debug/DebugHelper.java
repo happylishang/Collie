@@ -1,4 +1,4 @@
-package com.snail.collie.debugview;
+package com.snail.collie.debug;
 
 import android.content.Context;
 import android.os.Handler;

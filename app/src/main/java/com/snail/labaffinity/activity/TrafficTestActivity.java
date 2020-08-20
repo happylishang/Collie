@@ -43,7 +43,7 @@ public class TrafficTestActivity extends BaseActivity {
         });
 
         setContentView(webView);
-        webView.loadUrl("https://www.mi.com/");
-
+//        webView.loadUrl("https://www.mi.com/");
+        webView.loadUrl("https://you.163.com/");
     }
 }

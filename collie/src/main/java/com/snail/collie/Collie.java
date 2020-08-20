@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
-import com.snail.collie.debugview.DebugHelper;
+import com.snail.collie.debug.DebugHelper;
 import com.snail.collie.fps.FpsTracker;
 import com.snail.collie.fps.ITrackFpsListener;
 import com.snail.collie.trafficstats.ITrackTrafficStatsListener;

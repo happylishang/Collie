@@ -1,4 +1,4 @@
-package com.snail.collie.debugview;
+package com.snail.collie.debug;
 
 import android.util.Pair;
 import android.view.View;
