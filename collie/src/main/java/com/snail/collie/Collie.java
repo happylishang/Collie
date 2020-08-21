@@ -14,6 +14,7 @@ import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.debug.DebugHelper;
 import com.snail.collie.fps.FpsTracker;
 import com.snail.collie.fps.ITrackFpsListener;
+import com.snail.collie.mem.MemoryLeakTrack;
 import com.snail.collie.trafficstats.ITrackTrafficStatsListener;
 import com.snail.collie.trafficstats.TrafficStatsTracker;
 
@@ -98,7 +99,7 @@ public class Collie {
 
         @Override
         public void onActivityStarted(@NonNull final Activity activity) {
-
+            ActivityStack.getInstance().markStart();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityStarted(activity);
             }
@@ -121,6 +122,7 @@ public class Collie {
 
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
+            ActivityStack.getInstance().markStart();
             for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
                 item.onActivityStopped(activity);
             }
@@ -145,6 +147,7 @@ public class Collie {
     public void init(@NonNull Application application, final CollieListener listener) {
         application.registerActivityLifecycleCallbacks(mActivityLifecycleCallback);
         TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
+        new MemoryLeakTrack().startTrack();
         mCollieListeners.add(listener);
     }
 

@@ -26,7 +26,7 @@
                 android:id="@+id/first"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ViewPager"/>
+                android:text="测试内存泄漏"/>
             <Button
                 android:id="@+id/second"
                 android:layout_width="match_parent"

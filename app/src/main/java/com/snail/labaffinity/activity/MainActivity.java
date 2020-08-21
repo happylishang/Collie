@@ -25,7 +25,8 @@ public class MainActivity extends BaseActivity {
         mResultProfileBinding.contentMain1.first.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent mIntent=new Intent( MainActivity.this, LeakTestActivity.class);
+                startActivity(mIntent);
 
             }
         });

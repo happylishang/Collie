@@ -1,6 +1,7 @@
 package com.snail.collie.core;
 
 import android.app.Activity;
+import android.app.Application;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class ActivityStack {
         isInBackGround = false;
     }
 
-    public void markStop() {
+    public void markStart() {
         isInBackGround = getTopActivity() == getBottomActivity();
     }
 
