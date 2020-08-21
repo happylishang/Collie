@@ -28,6 +28,7 @@ public class Collie {
     private Handler mHandler;
     private ITrackFpsListener mITrackListener;
     private ITrackTrafficStatsListener mTrackTrafficStatsListener;
+    private MemoryLeakTrack.ITrackMemoryLeakListener mITrackMemoryLeakListener;
 
     private List<CollieListener> mCollieListeners = new ArrayList<>();
     private HashSet<Application.ActivityLifecycleCallbacks> mActivityLifecycleCallbacks = new HashSet<>();
@@ -63,6 +64,13 @@ public class Collie {
             @Override
             public void onTrafficStats(String activityName, long value) {
                 Log.v("Collie", "" + activityName + " 流量消耗 " + value * 1.0f / (1024 * 1024) + "M");
+            }
+        };
+
+        mITrackMemoryLeakListener = new MemoryLeakTrack.ITrackMemoryLeakListener() {
+            @Override
+            public void onLeakActivity(String activity, int count) {
+                Log.v("Collie", "内存泄露 " + activity + " 数量 " + count);
             }
         };
     }
@@ -123,7 +131,6 @@ public class Collie {
 
             ActivityStack.getInstance().markInBackGround();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
-
                 item.onActivityStopped(activity);
             }
             //   只针对TOP Activity
@@ -154,12 +161,18 @@ public class Collie {
                      final Config config,
                      final CollieListener listener) {
         application.registerActivityLifecycleCallbacks(mActivityLifecycleCallback);
-        TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
+        mCollieListeners.add(listener);
+
         if (config.userTrafficTrack) {
             TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
         }
-        mCollieListeners.add(listener);
-         MemoryLeakTrack.getInstance().startTrack();
+        if (config.userActivityLeak) {
+            MemoryLeakTrack.getInstance().startTrack();
+            MemoryLeakTrack.getInstance().addOnMemoryLeakListener(mITrackMemoryLeakListener);
+        }
+        if (config.userFpsTrack) {
+            FpsTracker.getInstance().startTrack();
+        }
     }
 
     public void showDebugView(Activity activity) {

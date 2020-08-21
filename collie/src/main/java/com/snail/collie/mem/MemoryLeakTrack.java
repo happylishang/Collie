@@ -1,28 +1,21 @@
 package com.snail.collie.mem;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.snail.collie.BuildConfig;
 import com.snail.collie.Collie;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
-import com.snail.collie.debug.DebugHelper;
-import com.snail.collie.fps.FpsTracker;
 
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 public class MemoryLeakTrack implements ITracker {
@@ -69,8 +62,22 @@ public class MemoryLeakTrack implements ITracker {
                         if (!ActivityStack.getInstance().isInBackGround()) {
                             return;
                         }
+                        HashMap<String, Integer> hashMap = new HashMap<>();
                         for (Map.Entry<Activity, String> activityStringEntry : mActivityStringWeakHashMap.entrySet()) {
-                            Log.v("MemoryLeakTrack", "" + activityStringEntry.getKey());
+                            String name=activityStringEntry.getKey().getClass().getName();
+                            Integer value = hashMap.get(name);
+                            if (value == null) {
+                                hashMap.put(name, 1);
+                            } else {
+                                hashMap.put(name, value + 1);
+                            }
+                        }
+                        for (Map.Entry<String, Integer> entry : hashMap.entrySet()) {
+                            if (mMemoryLeakListeners.size() > 0) {
+                                for (ITrackMemoryLeakListener listener : mMemoryLeakListeners) {
+                                    listener.onLeakActivity(entry.getKey(), entry.getValue());
+                                }
+                            }
                         }
                     } catch (Exception ignored) {
                     }
@@ -94,7 +101,20 @@ public class MemoryLeakTrack implements ITracker {
 
     }
 
-    public interface OnMemoryLeakListener {
+    private Set<ITrackMemoryLeakListener> mMemoryLeakListeners = new HashSet<>();
 
+    public void addOnMemoryLeakListener(ITrackMemoryLeakListener leakListener) {
+        mMemoryLeakListeners.add(leakListener);
     }
+
+    public void removeOnMemoryLeakListener(ITrackMemoryLeakListener leakListener) {
+        mMemoryLeakListeners.remove(leakListener);
+    }
+
+    public interface ITrackMemoryLeakListener {
+
+        void onLeakActivity(String activity, int count);
+    }
+
+
 }

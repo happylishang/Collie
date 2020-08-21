@@ -25,12 +25,7 @@ public class FpsTestActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Collie.getInstance().showDebugView(this);
-        getWindow().getDecorView().getViewTreeObserver().addOnTouchModeChangeListener(new ViewTreeObserver.OnTouchModeChangeListener() {
-            @Override
-            public void onTouchModeChanged(boolean isInTouchMode) {
 
-            }
-        });
         mActivitySecondBinding = ActivitySecondBinding.inflate(getLayoutInflater());
         setContentView(mActivitySecondBinding.getRoot());
         LinearLayoutManager linearLayoutManager= new LinearLayoutManager(this);

@@ -73,13 +73,13 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
             super.onActivityPaused(activity);
-            FpsTracker.getInstance().pauseTrack();
+            pauseTrack();
         }
 
         @Override
         public void onActivityResumed(@NonNull Activity activity) {
             super.onActivityResumed(activity);
-            startTrack();
+            resumeTrack();
         }
     };
 
@@ -221,6 +221,10 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
 
     @Override
     public void startTrack() {
+        Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
+    }
+
+    private void resumeTrack() {
         if (choreographer == null) {
             choreographer = Choreographer.getInstance();
             callbackQueueLock = reflectObject(choreographer, "mLock");

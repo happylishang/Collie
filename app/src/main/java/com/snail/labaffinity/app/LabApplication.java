@@ -32,6 +32,7 @@ public class LabApplication extends Application {
         Router.initBrowserRouter(this);
         Router.initActivityRouter(getApplicationContext());
         FirebaseAnalytics.getInstance(this);
+        Config config=new Config();
         Collie.getInstance().init(this, new Config(), new CollieListener() {
             @Override
             public void onFpsTrack(Activity activity, long currentFps, long currentDropFrame, long averageFps) {
