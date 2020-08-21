@@ -1,23 +1,45 @@
 package com.snail.collie.debug;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 
+import androidx.annotation.NonNull;
+
 import com.snail.collie.BuildConfig;
+import com.snail.collie.Collie;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
+import com.snail.collie.core.ITracker;
+import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 
 /**
  * 掉帧检测
  */
-public class DebugHelper {
+public class DebugHelper implements ITracker {
 
     private static volatile DebugHelper sInstance = null;
 
     private FloatingFpsView mDebugCollieView;
     private Handler mHandler;
     private FloatHelper mFloatHelper;
+    private SimpleActivityLifecycleCallbacks mSimpleActivityLifecycleCallbacks = new SimpleActivityLifecycleCallbacks() {
+
+        @Override
+        public void onActivityStopped(@NonNull Activity activity) {
+            super.onActivityStopped(activity);
+            if (ActivityStack.getInstance().isInBackGround()) {
+                hide();
+            }
+        }
+
+        @Override
+        public void onActivityResumed(@NonNull Activity activity) {
+            super.onActivityResumed(activity);
+            show(activity.getApplication());
+        }
+    };
 
     private DebugHelper() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
@@ -73,5 +95,20 @@ public class DebugHelper {
                 }
             });
         }
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
+    public void startTrack() {
+        Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
+    }
+
+    @Override
+    public void pauseTrack() {
+
     }
 }

@@ -3,6 +3,8 @@ package com.snail.collie.core;
 import android.app.Activity;
 import android.app.Application;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +41,8 @@ public class ActivityStack {
         isInBackGround = false;
     }
 
-    public void markInBackGround() {
-        isInBackGround = getTopActivity() == getBottomActivity();
+    public void markInBackGround(@NonNull Activity activity) {
+        isInBackGround = activity == getTopActivity();
     }
 
     public Activity getTopActivity() {

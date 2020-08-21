@@ -24,7 +24,6 @@ public class FpsTestActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Collie.getInstance().showDebugView(this.getApplication());
 
         mActivitySecondBinding = ActivitySecondBinding.inflate(getLayoutInflater());
         setContentView(mActivitySecondBinding.getRoot());

@@ -106,7 +106,6 @@ public class Collie {
 
         @Override
         public void onActivityStarted(@NonNull final Activity activity) {
-            ActivityStack.getInstance().markInBackGround();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityStarted(activity);
             }
@@ -115,6 +114,7 @@ public class Collie {
 
         @Override
         public void onActivityResumed(@NonNull Activity activity) {
+            ActivityStack.getInstance().markResume();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityResumed(activity);
             }
@@ -129,16 +129,9 @@ public class Collie {
 
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
-
-            ActivityStack.getInstance().markInBackGround();
+            ActivityStack.getInstance().markInBackGround(activity);
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityStopped(activity);
-            }
-            //   只针对TOP Activity
-            if (ActivityStack.getInstance().getTopActivity() == ActivityStack.getInstance().getBottomActivity()) {
-                if (BuildConfig.DEBUG) {
-                    DebugHelper.getInstance().hide();
-                }
             }
         }
 
@@ -174,11 +167,8 @@ public class Collie {
         if (config.userFpsTrack) {
             FpsTracker.getInstance().startTrack();
         }
-    }
-
-    public void showDebugView(Application application) {
-        if (BuildConfig.DEBUG) {
-            DebugHelper.getInstance().show(application);
+        if (config.showDebugView) {
+            DebugHelper.getInstance().startTrack();
         }
     }
 
