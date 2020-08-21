@@ -6,5 +6,5 @@ public class ProcMemoryInfo {
 
     public boolean mainProc;
     public int id;
-    public Debug.MemoryInfo memoryInfo;
+    public Debug.MemoryInfo nativeMemoryInfo;
 }

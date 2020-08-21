@@ -27,6 +27,8 @@ public class MemoryLeakTrack implements ITracker {
 
     private static volatile MemoryLeakTrack sInstance = null;
     private long mStep;
+    private static long M = 1024 * 1024;
+
     private MemoryLeakTrack() {
     }
 
@@ -133,6 +135,17 @@ public class MemoryLeakTrack implements ITracker {
         if (size <= 0) {
             return null;
         }
+        //  系统内存
+        ActivityManager.MemoryInfo sysMemoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(sysMemoryInfo);
+
+        //java内存
+        Runtime rt = Runtime.getRuntime();
+        JavaMemory javaMemory = new JavaMemory();
+        javaMemory.freeMemory = rt.freeMemory() / M;
+        javaMemory.maxMemory = rt.maxMemory() / M;
+        javaMemory.totalMemory = rt.totalMemory() / M;
+        //进程Native内存
         ProcMemoryInfo[] procMemoryInfos = new ProcMemoryInfo[size];
         for (int i = 0; i < size; i++) {
             ActivityManager.RunningAppProcessInfo info = list.get(i);
@@ -142,7 +155,7 @@ public class MemoryLeakTrack implements ITracker {
             ProcMemoryInfo procMemoryInfo = new ProcMemoryInfo();
             procMemoryInfo.id = info.pid;
             procMemoryInfo.mainProc = info.processName.equals(application.getPackageName());
-            procMemoryInfo.memoryInfo = memoryInfos[0];
+            procMemoryInfo.nativeMemoryInfo = memoryInfos[0];
             procMemoryInfos[i] = procMemoryInfo;
         }
         return procMemoryInfos;
