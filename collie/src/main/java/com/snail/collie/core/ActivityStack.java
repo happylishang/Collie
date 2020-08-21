@@ -11,9 +11,8 @@ import java.util.List;
 public class ActivityStack {
 
     private static volatile ActivityStack sInstance = null;
-
     private List<Activity> mActivities = new ArrayList<>();
-    private boolean isInBackGround;
+    private int mCurrentSate;
 
     private ActivityStack() {
     }
@@ -38,11 +37,11 @@ public class ActivityStack {
     }
 
     public void markResume() {
-        isInBackGround = false;
+        mCurrentSate++;
     }
 
-    public void markInBackGround(@NonNull Activity activity) {
-        isInBackGround = activity == getTopActivity();
+    public void markStop() {
+        mCurrentSate--;
     }
 
     public Activity getTopActivity() {
@@ -50,12 +49,7 @@ public class ActivityStack {
         return mActivities.size() > 0 ? mActivities.get(0) : null;
     }
 
-    public Activity getBottomActivity() {
-
-        return mActivities.size() > 0 ? mActivities.get(mActivities.size() - 1) : null;
-    }
-
     public boolean isInBackGround() {
-        return isInBackGround;
+        return mCurrentSate == 0;
     }
 }

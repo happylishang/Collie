@@ -2,7 +2,6 @@ package com.snail.collie;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -129,7 +128,7 @@ public class Collie {
 
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
-            ActivityStack.getInstance().markInBackGround(activity);
+            ActivityStack.getInstance().markStop();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityStopped(activity);
             }
