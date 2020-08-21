@@ -1,7 +1,9 @@
 package com.snail.collie.debug;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.net.Uri;
@@ -59,7 +61,7 @@ public class FloatHelper {
     }
 
     public FloatHelper setInitPosition(int x, int y) {
-        mGravity = Gravity.START| Gravity.TOP;
+        mGravity = Gravity.START | Gravity.TOP;
         mInitX = x;
         mInitY = y;
         mNeedReload = true;
@@ -75,6 +77,7 @@ public class FloatHelper {
         return this;
     }
 
+
     /**
      * 显示悬浮窗(需先保证已有权限)
      *
@@ -82,8 +85,7 @@ public class FloatHelper {
      */
     public boolean show(Activity activity) {
         if (!hasOverlayPermission(mContext)) {
-
-            requestOverlayPermission(activity, FloatHelper.PERMISSIONS_REQUEST_OVERLAY);
+            showTips(activity);
             return false;
         }
         if (isShowing()) {
@@ -95,6 +97,29 @@ public class FloatHelper {
             mWindow.open();
         }
         return true;
+    }
+
+    private void showTips(final Activity activity) {
+        AlertDialog dialog = new AlertDialog.Builder(activity)
+                .setMessage("您需要打开悬浮窗权限")
+                //可以直接设置这三种button
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        requestOverlayPermission(activity, FloatHelper.PERMISSIONS_REQUEST_OVERLAY);
+                        dialog.dismiss();
+
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
     }
 
     /**

@@ -34,6 +34,7 @@ public class DebugHelper {
     }
 
     public void show(final Context context) {
+
         if (mFloatHelper != null && mFloatHelper.isShowing()) {
             return;
         }
