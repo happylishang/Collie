@@ -53,8 +53,8 @@ public class MemoryLeakTrack implements ITracker {
                 return;
             }
             Runtime.getRuntime().gc();
+            System.gc();
             SystemClock.sleep(100);
-            System.runFinalization();
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -62,6 +62,7 @@ public class MemoryLeakTrack implements ITracker {
                         if (!ActivityStack.getInstance().isInBackGround()) {
                             return;
                         }
+                        System.runFinalization();
                         HashMap<String, Integer> hashMap = new HashMap<>();
                         for (Map.Entry<Activity, String> activityStringEntry : mActivityStringWeakHashMap.entrySet()) {
                             String name=activityStringEntry.getKey().getClass().getName();
@@ -72,6 +73,8 @@ public class MemoryLeakTrack implements ITracker {
                                 hashMap.put(name, value + 1);
                             }
                         }
+
+
                         for (Map.Entry<String, Integer> entry : hashMap.entrySet()) {
                             if (mMemoryLeakListeners.size() > 0) {
                                 for (ITrackMemoryLeakListener listener : mMemoryLeakListeners) {

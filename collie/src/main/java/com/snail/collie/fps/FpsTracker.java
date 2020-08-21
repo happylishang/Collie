@@ -242,6 +242,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     public void pauseTrack() {
         LooperMonitor.unregister(this);
         mITrackListeners.clear();
+        mActivityCollectItemHashMap.clear();
         mStartTime = 0;
     }
 }
