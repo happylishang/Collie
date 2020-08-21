@@ -159,7 +159,7 @@ public class Collie {
             TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
         }
         mCollieListeners.add(listener);
-        new MemoryLeakTrack().startTrack();
+         MemoryLeakTrack.getInstance().startTrack();
     }
 
     public void showDebugView(Activity activity) {
