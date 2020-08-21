@@ -30,7 +30,7 @@ public class Collie {
     private ITrackTrafficStatsListener mTrackTrafficStatsListener;
 
     private List<CollieListener> mCollieListeners = new ArrayList<>();
-    private HashSet<Application.ActivityLifecycleCallbacks> mActivityLifecycleCallbacks=new HashSet<>();
+    private HashSet<Application.ActivityLifecycleCallbacks> mActivityLifecycleCallbacks = new HashSet<>();
 
     private Collie() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
@@ -40,8 +40,6 @@ public class Collie {
                 final long currentFps = currentCostMils == 0 ? 60 : Math.min(60, 1000 / currentCostMils);
 //                Log.v("Collie", "实时帧率 " + currentFps + " 掉帧 " + currentDropFrame + " 1S平均帧率 " + averageFps + " 本次耗时 " + currentCostMils);
                 mHandler.post(new Runnable() {
-
-
                     @Override
                     public void run() {
 
@@ -64,7 +62,7 @@ public class Collie {
         mTrackTrafficStatsListener = new ITrackTrafficStatsListener() {
             @Override
             public void onTrafficStats(String activityName, long value) {
-                Log.v("Collie", "" + activityName + " 流量消耗 " + value*1.0f/(1024*1024)+"M");
+                Log.v("Collie", "" + activityName + " 流量消耗 " + value * 1.0f / (1024 * 1024) + "M");
             }
         };
     }
@@ -80,11 +78,11 @@ public class Collie {
         return sInstance;
     }
 
-    public void addActivityLifecycleCallbacks(Application.ActivityLifecycleCallbacks callbacks){
+    public void addActivityLifecycleCallbacks(Application.ActivityLifecycleCallbacks callbacks) {
         mActivityLifecycleCallbacks.add(callbacks);
     }
 
-    public void removeActivityLifecycleCallbacks(Application.ActivityLifecycleCallbacks callbacks){
+    public void removeActivityLifecycleCallbacks(Application.ActivityLifecycleCallbacks callbacks) {
         mActivityLifecycleCallbacks.remove(callbacks);
     }
 
@@ -92,8 +90,8 @@ public class Collie {
         @Override
         public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle bundle) {
             ActivityStack.getInstance().push(activity);
-            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
-                item.onActivityCreated(activity,bundle);
+            for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
+                item.onActivityCreated(activity, bundle);
             }
         }
 
@@ -108,30 +106,38 @@ public class Collie {
 
         @Override
         public void onActivityResumed(@NonNull Activity activity) {
-            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
+            for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityResumed(activity);
             }
         }
 
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
-            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
+            for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityPaused(activity);
             }
         }
 
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
+ 
             ActivityStack.getInstance().markStart();
             for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
+ 
                 item.onActivityStopped(activity);
+            }
+            //   只针对TOP Activity
+            if (ActivityStack.getInstance().getTopActivity() == ActivityStack.getInstance().getBottomActivity()) {
+                if (BuildConfig.DEBUG) {
+                    DebugHelper.getInstance().hide();
+                }
             }
         }
 
         @Override
         public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle bundle) {
-            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
-                item.onActivitySaveInstanceState(activity,bundle);
+            for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
+                item.onActivitySaveInstanceState(activity, bundle);
             }
         }
 
@@ -144,10 +150,20 @@ public class Collie {
         }
     };
 
-    public void init(@NonNull Application application, final CollieListener listener) {
+    public void init(@NonNull Application application,
+                     final Config config,
+                     final CollieListener listener) {
         application.registerActivityLifecycleCallbacks(mActivityLifecycleCallback);
+ 
         TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
         new MemoryLeakTrack().startTrack();
+ 
+
+        if (config.userTrafficTrack) {
+            TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
+        }
+
+ 
         mCollieListeners.add(listener);
     }
 

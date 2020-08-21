@@ -43,7 +43,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
 
     private FpsTracker() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
-        Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
     }
 
     public static FpsTracker getInstance() {
@@ -75,12 +74,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         public void onActivityPaused(@NonNull Activity activity) {
             super.onActivityPaused(activity);
             FpsTracker.getInstance().pauseTrack();
-            //   只针对TOP Activity
-            if (ActivityStack.getInstance().getTopActivity() == ActivityStack.getInstance().getBottomActivity()) {
-                if (BuildConfig.DEBUG) {
-                    DebugHelper.getInstance().hide();
-                }
-            }
         }
 
         @Override

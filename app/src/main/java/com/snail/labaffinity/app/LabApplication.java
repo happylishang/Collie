@@ -8,6 +8,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.netease.nis.bugrpt.CrashHandler;
 import com.snail.collie.Collie;
 import com.snail.collie.CollieListener;
+import com.snail.collie.Config;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -31,7 +32,7 @@ public class LabApplication extends Application {
         Router.initBrowserRouter(this);
         Router.initActivityRouter(getApplicationContext());
         FirebaseAnalytics.getInstance(this);
-        Collie.getInstance().init(this, new CollieListener() {
+        Collie.getInstance().init(this, new Config(), new CollieListener() {
             @Override
             public void onFpsTrack(Activity activity, long currentFps, long currentDropFrame, long averageFps) {
 

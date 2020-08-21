@@ -22,7 +22,6 @@ public class TrafficStatsTracker implements ITracker {
     private long mCurrentStats;
     private static int sSequence;
     private List<ITrackTrafficStatsListener> mStatsListeners = new ArrayList<>();
-
     private Application.ActivityLifecycleCallbacks mActivityLifecycleCallbacks = new SimpleActivityLifecycleCallbacks() {
         @Override
         public void onActivityStarted(@NonNull Activity activity) {
