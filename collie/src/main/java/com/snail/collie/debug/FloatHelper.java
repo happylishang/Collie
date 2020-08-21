@@ -178,7 +178,7 @@ public class FloatHelper {
 
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + activity.getPackageName()));
-        activity.startActivityForResult(intent, reqCode);
+        activity.startActivity(intent);
         return true;
     }
 

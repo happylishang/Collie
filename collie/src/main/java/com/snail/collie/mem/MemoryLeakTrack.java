@@ -6,7 +6,9 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Debug;
 import android.os.Handler;
+import android.os.Process;
 import android.os.SystemClock;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
@@ -16,6 +18,9 @@ import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +32,7 @@ public class MemoryLeakTrack implements ITracker {
 
     private static volatile MemoryLeakTrack sInstance = null;
     private long mStep;
-    private static long M = 1024 * 1024;
+    private static int M = 1024 * 1024;
 
     private MemoryLeakTrack() {
     }
@@ -56,7 +61,12 @@ public class MemoryLeakTrack implements ITracker {
         public void onActivityStopped(@NonNull final Activity activity) {
             super.onActivityStopped(activity);
             if (mStep++ % 3 == 0) {
-                collectMemoryInfo(activity.getApplication());
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        collectMemoryInfo(activity.getApplication());
+                    }
+                });
             }
             //  退后台，GC 找LeakActivity
             if (ActivityStack.getInstance().isInBackGround()) {
@@ -127,37 +137,72 @@ public class MemoryLeakTrack implements ITracker {
         void onLeakActivity(String activity, int count);
     }
 
-    private ProcMemoryInfo[] collectMemoryInfo(Application application) {
+    private static String display;
 
-        ActivityManager activityManager = (ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> list = activityManager.getRunningAppProcesses();
-        int size = list == null ? 0 : list.size();
-        if (size <= 0) {
-            return null;
+    private TrackMemoryInfo collectMemoryInfo(Application application) {
+
+        if (TextUtils.isEmpty(display)) {
+            display = "" + application.getResources().getDisplayMetrics().widthPixels + "*" + application.getResources().getDisplayMetrics().heightPixels;
         }
-        //  系统内存
-        ActivityManager.MemoryInfo sysMemoryInfo = new ActivityManager.MemoryInfo();
-        activityManager.getMemoryInfo(sysMemoryInfo);
+        ActivityManager activityManager = (ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE);
+        // 系统内存
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        SystemMemory systemMemory = new SystemMemory();
+        systemMemory.availMem = memoryInfo.availMem >> 20;
+        systemMemory.totalMem = memoryInfo.totalMem >> 20;
+        systemMemory.lowMemory = memoryInfo.lowMemory;
+        systemMemory.threshold = memoryInfo.threshold >> 20;
 
         //java内存
         Runtime rt = Runtime.getRuntime();
         JavaMemory javaMemory = new JavaMemory();
-        javaMemory.freeMemory = rt.freeMemory() / M;
-        javaMemory.maxMemory = rt.maxMemory() / M;
-        javaMemory.totalMemory = rt.totalMemory() / M;
+        javaMemory.freeMemory = rt.freeMemory() >> 20;
+        javaMemory.maxMemory = rt.maxMemory() >> 20;
+        javaMemory.totalMemory = rt.totalMemory() >> 20;
+
         //进程Native内存
-        ProcMemoryInfo[] procMemoryInfos = new ProcMemoryInfo[size];
-        for (int i = 0; i < size; i++) {
-            ActivityManager.RunningAppProcessInfo info = list.get(i);
-            int[] pids = new int[1];
-            pids[0] = info.pid;
-            Debug.MemoryInfo[] memoryInfos = activityManager.getProcessMemoryInfo(pids);
-            ProcMemoryInfo procMemoryInfo = new ProcMemoryInfo();
-            procMemoryInfo.id = info.pid;
-            procMemoryInfo.mainProc = info.processName.equals(application.getPackageName());
-            procMemoryInfo.nativeMemoryInfo = memoryInfos[0];
-            procMemoryInfos[i] = procMemoryInfo;
-        }
-        return procMemoryInfos;
+
+        NativeMemory nativeMemory = new NativeMemory();
+        Debug.MemoryInfo debugMemoryInfo = new Debug.MemoryInfo();
+        Debug.getMemoryInfo(debugMemoryInfo);
+
+        nativeMemory.nativeHeapAllocatedSize = Debug.getNativeHeapAllocatedSize() >> 20;
+        nativeMemory.nativeHeapFreeSize = Debug.getNativeHeapFreeSize() >> 20;
+        nativeMemory.nativeHeapSize = Debug.getNativeHeapSize() >> 20;
+
+        TrackMemoryInfo trackMemoryInfo = new TrackMemoryInfo();
+        trackMemoryInfo.javaMemory = javaMemory;
+        trackMemoryInfo.systemMemoryInfo = systemMemory;
+        trackMemoryInfo.nativeMemory = nativeMemory;
+
+        trackMemoryInfo.procName = getProcessName(Process.myPid());
+        trackMemoryInfo.display = display;
+        return trackMemoryInfo;
     }
+
+
+    private static String getProcessName(int pid) {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader("/proc/" + pid + "/cmdline"));
+            String processName = reader.readLine();
+            if (!TextUtils.isEmpty(processName)) {
+                processName = processName.trim();
+            }
+            return processName;
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 }
