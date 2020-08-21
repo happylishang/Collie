@@ -1,6 +1,7 @@
 package com.snail.collie.fps;
 
 import android.app.Activity;
+import android.app.Application;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.Choreographer;
@@ -73,7 +74,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
             super.onActivityPaused(activity);
-            pauseTrack();
+            pauseTrack(activity.getApplication());
         }
 
         @Override
@@ -214,13 +215,13 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     }
 
     @Override
-    public void destroy() {
+    public void destroy(Application application) {
         sInstance = null;
     }
 
 
     @Override
-    public void startTrack() {
+    public void startTrack(Application application) {
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
     }
 
@@ -239,7 +240,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     }
 
     @Override
-    public void pauseTrack() {
+    public void pauseTrack(Application application) {
         LooperMonitor.unregister(this);
         mITrackListeners.clear();
         mActivityCollectItemHashMap.clear();

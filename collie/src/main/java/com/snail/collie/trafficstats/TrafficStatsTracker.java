@@ -99,18 +99,18 @@ public class TrafficStatsTracker implements ITracker {
     }
 
     @Override
-    public void destroy() {
+    public void destroy(Application application) {
         Collie.getInstance().removeActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
         sInstance = null;
     }
 
     @Override
-    public void startTrack() {
+    public void startTrack(Application application) {
 
     }
 
     @Override
-    public void pauseTrack() {
+    public void pauseTrack(Application application) {
 
     }
 

@@ -36,7 +36,7 @@
             android:name=".activity.FpsTestActivity" />
         <activity android:name=".activity.TrafficTestActivity" />
         <activity android:name=".activity.LeakTestActivity"
-            android:process=":leak"/>
+            />
 
         <service android:name=".service.BackGroundService"
            />

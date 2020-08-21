@@ -1,12 +1,14 @@
 package com.snail.collie.core;
 
+import android.app.Application;
+
 public interface ITracker {
 
 
-    void destroy();
+    void destroy(Application application);
 
-    void startTrack();
+    void startTrack(Application application);
 
-    void pauseTrack();
+    void pauseTrack(Application application);
 
 }

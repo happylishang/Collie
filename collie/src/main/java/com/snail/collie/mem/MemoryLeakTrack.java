@@ -109,17 +109,17 @@ public class MemoryLeakTrack implements ITracker {
     };
 
     @Override
-    public void destroy() {
+    public void destroy(Application application) {
         Collie.getInstance().removeActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
     }
 
     @Override
-    public void startTrack() {
+    public void startTrack(Application application) {
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
     }
 
     @Override
-    public void pauseTrack() {
+    public void pauseTrack(Application application) {
 
     }
 

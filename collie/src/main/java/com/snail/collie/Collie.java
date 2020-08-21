@@ -9,6 +9,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snail.collie.battery.BatteryStatsTrack;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.debug.DebugHelper;
@@ -159,16 +160,22 @@ public class Collie {
         if (config.userTrafficTrack) {
             TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
         }
-        if (config.userActivityLeak) {
-            MemoryLeakTrack.getInstance().startTrack();
+        if (config.userMemTrack) {
+            MemoryLeakTrack.getInstance().startTrack(application);
             MemoryLeakTrack.getInstance().addOnMemoryLeakListener(mITrackMemoryLeakListener);
         }
         if (config.userFpsTrack) {
-            FpsTracker.getInstance().startTrack();
+            FpsTracker.getInstance().startTrack(application);
         }
         if (config.showDebugView) {
-            DebugHelper.getInstance().startTrack();
+            DebugHelper.getInstance().startTrack(application);
         }
+
+        if (config.userBatteryTrack) {
+            BatteryStatsTrack.getInstance().startTrack(application);
+        }
+
+
     }
 
     public void registerCollieListener(CollieListener listener) {

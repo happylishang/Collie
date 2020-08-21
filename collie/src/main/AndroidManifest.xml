@@ -3,4 +3,7 @@
 
     /
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <application>
+        <receiver android:name=".battery.BatteryLevelReceiver" />
+    </application>
 </manifest>
