@@ -1,5 +1,6 @@
 package com.snail.collie.debug;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 
@@ -33,7 +34,7 @@ public class DebugHelper {
         return sInstance;
     }
 
-    public void show(final Context context) {
+    public void show(final Application context) {
 
         if (mFloatHelper != null && mFloatHelper.isShowing()) {
             return;

@@ -2,6 +2,7 @@ package com.snail.collie;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -175,9 +176,9 @@ public class Collie {
         }
     }
 
-    public void showDebugView(Activity activity) {
+    public void showDebugView(Application application) {
         if (BuildConfig.DEBUG) {
-            DebugHelper.getInstance().show(activity);
+            DebugHelper.getInstance().show(application);
         }
     }
 

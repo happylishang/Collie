@@ -215,9 +215,9 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
 
     @Override
     public void destroy() {
-        Collie.getInstance().removeActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
         sInstance = null;
     }
+
 
     @Override
     public void startTrack() {
