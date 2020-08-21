@@ -40,31 +40,25 @@ public class MemoryLeakTrack implements ITracker {
             super.onActivityStopped(activity);
             if (ActivityStack.getInstance().isInBackGround()) {
                 System.gc();
-
-                for (WeakReference<Activity> item : weakReferences) {
-                    Log.v("MemoryLeakTrack", "" + item.get());
-                }
-
-//                mHandler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Log.v("MemoryLeakTrack", "start");
-//                        try {
-//                            Reference k;
-//                            while ((k = mReferenceQueue.remove()) != null) {
+                System.gc();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.v("MemoryLeakTrack", "start");
+                        try {
+                            Reference k;
+//                            while ((k = mReferenceQueue.remove(1)) != null) {
 //                                weakReferences.remove(k);
 //                            }
-//
-//                            for (WeakReference<Activity> item : weakReferences) {
-//                                Log.v("MemoryLeakTrack", "" + item.get());
-//                            }
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//
-//
-//                    }
-//                }, 1000);
+                            for (WeakReference<Activity> item : weakReferences) {
+                                Log.v("MemoryLeakTrack", "" + (item.get()==null?"d":item.get()));
+                            }
+                        } catch (Exception e) {
+                            Log.v("MemoryLeakTrack", "3");
+                            e.printStackTrace();
+                        }
+                    }
+                }, 3000);
             }
 
         }

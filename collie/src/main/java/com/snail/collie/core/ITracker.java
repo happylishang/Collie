@@ -9,5 +9,4 @@ public interface ITracker {
 
     void pauseTrack();
 
-    void openTrack();
 }

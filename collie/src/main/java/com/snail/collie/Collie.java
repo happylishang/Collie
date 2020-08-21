@@ -97,7 +97,7 @@ public class Collie {
 
         @Override
         public void onActivityStarted(@NonNull final Activity activity) {
-            ActivityStack.getInstance().markStart();
+            ActivityStack.getInstance().markInBackGround();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityStarted(activity);
             }
@@ -120,10 +120,10 @@ public class Collie {
 
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
- 
-            ActivityStack.getInstance().markStart();
-            for(Application.ActivityLifecycleCallbacks item:mActivityLifecycleCallbacks){
- 
+
+            ActivityStack.getInstance().markInBackGround();
+            for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
+
                 item.onActivityStopped(activity);
             }
             //   只针对TOP Activity
@@ -154,17 +154,12 @@ public class Collie {
                      final Config config,
                      final CollieListener listener) {
         application.registerActivityLifecycleCallbacks(mActivityLifecycleCallback);
- 
         TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
-        new MemoryLeakTrack().startTrack();
- 
-
         if (config.userTrafficTrack) {
             TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
         }
-
- 
         mCollieListeners.add(listener);
+        new MemoryLeakTrack().startTrack();
     }
 
     public void showDebugView(Activity activity) {

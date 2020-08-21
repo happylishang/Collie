@@ -39,7 +39,7 @@ public class ActivityStack {
         isInBackGround = false;
     }
 
-    public void markStart() {
+    public void markInBackGround() {
         isInBackGround = getTopActivity() == getBottomActivity();
     }
 
