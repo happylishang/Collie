@@ -91,11 +91,11 @@ public class LauncherTracker implements ITracker {
                             @Override
                             public void run() {
                                 if (isColdStarUp) {
-                                    for (ILaucherTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
+                                    for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
                                         launcherTrackListener.onColdLaunchCost(coldLauncherTime);
                                     }
                                 }
-                                for (ILaucherTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
+                                for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
                                     launcherTrackListener.onActivityLaunchCost(activity, activityLauncherTime);
                                 }
 
@@ -124,17 +124,17 @@ public class LauncherTracker implements ITracker {
 
     }
 
-    private Set<ILaucherTrackListener> mILaucherTrackListenerSet = new HashSet<>();
+    private Set<ILaunchTrackListener> mILaucherTrackListenerSet = new HashSet<>();
 
-    public void addILaucherTrackListener(ILaucherTrackListener laucherTrackListener) {
+    public void addILaucherTrackListener(ILaunchTrackListener laucherTrackListener) {
         mILaucherTrackListenerSet.add(laucherTrackListener);
     }
 
-    public void removeILaucherTrackListener(ILaucherTrackListener laucherTrackListener) {
+    public void removeILaucherTrackListener(ILaunchTrackListener laucherTrackListener) {
         mILaucherTrackListenerSet.remove(laucherTrackListener);
     }
 
-    public interface ILaucherTrackListener {
+    public interface ILaunchTrackListener {
 
         void onColdLaunchCost(long duration);
 
