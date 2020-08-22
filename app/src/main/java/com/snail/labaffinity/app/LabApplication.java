@@ -10,6 +10,7 @@ import com.netease.nis.bugrpt.CrashHandler;
 import com.snail.collie.Collie;
 import com.snail.collie.CollieListener;
 import com.snail.collie.Config;
+import com.snail.collie.mem.TrackMemoryInfo;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -33,10 +34,35 @@ public class LabApplication extends Application {
         Router.initBrowserRouter(this);
         Router.initActivityRouter(getApplicationContext());
         FirebaseAnalytics.getInstance(this);
-        Config config=new Config();
         Collie.getInstance().init(this, new Config(), new CollieListener() {
+
             @Override
-            public void onFpsTrack(Activity activity, long currentFps, long currentDropFrame, long averageFps) {
+            public void onTrafficStats(String activityName, long value) {
+
+            }
+
+            @Override
+            public void onColdLaucherCost(long duration) {
+
+            }
+
+            @Override
+            public void onActivityStartCost(Activity activity, long duration) {
+
+            }
+
+            @Override
+            public void onLeakActivity(String activity, int count) {
+
+            }
+
+            @Override
+            public void onCurrentMemoryCost(TrackMemoryInfo trackMemoryInfo) {
+
+            }
+
+            @Override
+            public void onFpsTrack(Activity activity, long currentCostMils, long currentDropFrame, boolean isInFrameDraw, long averageFps) {
 
             }
         });
