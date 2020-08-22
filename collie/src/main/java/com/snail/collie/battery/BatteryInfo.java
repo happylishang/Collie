@@ -8,5 +8,7 @@ public class BatteryInfo {
     public String activityName;
     public float cost;
     public long duration;
-
+    public String display;
+    public String total;
+    public float screenBrightness;
 }

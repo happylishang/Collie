@@ -8,18 +8,31 @@ import android.os.BatteryManager;
 public class BatteryLevelReceiver extends BroadcastReceiver {
 
     private volatile float batteryPct;
+    private int level;
+    private int scale;
+    private boolean isCharging;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         //当前剩余电量
-        int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         //电量最大值
-        int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-        //电量百分比
-        batteryPct = level / (float) scale;
+        scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        int status = intent.getIntExtra("status", 0);
+        isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == BatteryManager.BATTERY_STATUS_FULL;
     }
 
-    public int getCurrentBatteryPercent() {
-        return (int) (batteryPct * 100);
+    public int getCurrentBatteryLevel() {
+        return level;
+    }
+
+    public int getTotalBatteryPercent() {
+        return scale;
+    }
+
+    public boolean isCharging() {
+        return isCharging;
     }
 }

@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.BatteryManager;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -22,6 +22,7 @@ import java.util.HashMap;
 public class BatteryStatsTrack implements ITracker {
     private static BatteryStatsTrack sInstance;
     private Handler mHandler;
+    private String display;
 
     private BatteryStatsTrack() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
@@ -43,10 +44,10 @@ public class BatteryStatsTrack implements ITracker {
         @Override
         public void onActivityPaused(final @NonNull Activity activity) {
             super.onActivityPaused(activity);
-            BatteryInfo batteryInfo = map.get(activity);
+            BatteryInfo batteryInfo = mBatteryInfoHashMap.get(activity);
             if (batteryInfo == null) {
                 batteryInfo = new BatteryInfo();
-                map.put(activity, batteryInfo);
+                mBatteryInfoHashMap.put(activity, batteryInfo);
             }
             final BatteryInfo batteryInfoBack = batteryInfo;
             mHandler.post(new Runnable() {
@@ -61,7 +62,13 @@ public class BatteryStatsTrack implements ITracker {
         public void onActivityStarted(@NonNull Activity activity) {
             super.onActivityStarted(activity);
             lastTimeStamp = SystemClock.uptimeMillis();
-            lastPercent = mBatteryLevelReceiver.getCurrentBatteryPercent();
+            lastPercent = mBatteryLevelReceiver.getCurrentBatteryLevel();
+        }
+
+        @Override
+        public void onActivityDestroyed(@NonNull Activity activity) {
+            super.onActivityDestroyed(activity);
+            mBatteryInfoHashMap.remove(activity);
         }
     };
 
@@ -86,7 +93,7 @@ public class BatteryStatsTrack implements ITracker {
     }
 
     private BatteryLevelReceiver mBatteryLevelReceiver;
-    private HashMap<Activity, BatteryInfo> map = new HashMap<>();
+    private HashMap<Activity, BatteryInfo> mBatteryInfoHashMap = new HashMap<>();
 
     @Override
     public void pauseTrack(Application application) {
@@ -95,22 +102,18 @@ public class BatteryStatsTrack implements ITracker {
 
     private BatteryInfo computeBatteryInfo(Activity activity, @NonNull BatteryInfo info) {
         info.activityName = activity.getClass().getSimpleName();
-        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        android.content.Intent batteryStatus = activity.getApplication().registerReceiver(null, filter);
-        BatteryInfo batteryInfo = new BatteryInfo();
-        try {
-            // 充电状态
-            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-            boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                    status == BatteryManager.BATTERY_STATUS_FULL;
-            batteryInfo.charging = isCharging;
-            batteryInfo.cost = isCharging ? 0 : batteryInfo.cost + (lastPercent - mBatteryLevelReceiver.getCurrentBatteryPercent());
-            batteryInfo.duration += SystemClock.uptimeMillis() - lastTimeStamp;
-            Log.v("Battery", "" + batteryInfo.duration + " cost " + batteryInfo.cost);
-        } catch (Exception e) {
 
+        if (TextUtils.isEmpty(display)) {
+            display = "" + activity.getResources().getDisplayMetrics().widthPixels + "*" + activity.getResources().getDisplayMetrics().heightPixels;
         }
 
+        BatteryInfo batteryInfo = new BatteryInfo();
+        batteryInfo.charging = mBatteryLevelReceiver.isCharging();
+        batteryInfo.cost = mBatteryLevelReceiver.isCharging() ? 0 : batteryInfo.cost + (lastPercent - mBatteryLevelReceiver.getCurrentBatteryLevel());
+        batteryInfo.duration += SystemClock.uptimeMillis() - lastTimeStamp;
+        batteryInfo.screenBrightness = activity.getWindow().getAttributes().screenBrightness;
+        batteryInfo.display = display;
+        Log.v("Battery", "" + batteryInfo.duration + " cost " + batteryInfo.cost);
         return batteryInfo;
     }
 

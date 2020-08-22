@@ -12,7 +12,7 @@ public class ActivityStack {
 
     private static volatile ActivityStack sInstance = null;
     private List<Activity> mActivities = new ArrayList<>();
-    private int mCurrentSate;
+    private volatile int mCurrentSate;
 
     private ActivityStack() {
     }
@@ -36,7 +36,7 @@ public class ActivityStack {
         mActivities.remove(activity);
     }
 
-    public void markResume() {
+    public void markStart() {
         mCurrentSate++;
     }
 

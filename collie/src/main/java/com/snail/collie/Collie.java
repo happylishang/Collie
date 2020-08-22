@@ -106,6 +106,7 @@ public class Collie {
 
         @Override
         public void onActivityStarted(@NonNull final Activity activity) {
+            ActivityStack.getInstance().markStart();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityStarted(activity);
             }
@@ -114,7 +115,6 @@ public class Collie {
 
         @Override
         public void onActivityResumed(@NonNull Activity activity) {
-            ActivityStack.getInstance().markResume();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityResumed(activity);
             }

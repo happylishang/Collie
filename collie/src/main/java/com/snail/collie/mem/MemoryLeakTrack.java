@@ -69,7 +69,7 @@ public class MemoryLeakTrack implements ITracker {
                 });
             }
             //  退后台，GC 找LeakActivity
-            if (ActivityStack.getInstance().isInBackGround()) {
+            if (!ActivityStack.getInstance().isInBackGround()) {
                 return;
             }
             Runtime.getRuntime().gc();
@@ -92,10 +92,8 @@ public class MemoryLeakTrack implements ITracker {
                                 hashMap.put(name, value + 1);
                             }
                         }
-
-
-                        for (Map.Entry<String, Integer> entry : hashMap.entrySet()) {
-                            if (mMemoryLeakListeners.size() > 0) {
+                        if (mMemoryLeakListeners.size() > 0) {
+                            for (Map.Entry<String, Integer> entry : hashMap.entrySet()) {
                                 for (ITrackMemoryLeakListener listener : mMemoryLeakListeners) {
                                     listener.onLeakActivity(entry.getKey(), entry.getValue());
                                 }
