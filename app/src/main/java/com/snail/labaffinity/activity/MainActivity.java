@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -15,10 +16,11 @@ public class MainActivity extends BaseActivity {
 
     private int count;
     ActivityMainBinding mResultProfileBinding;
-
+    long  start=SystemClock.uptimeMillis();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        Log.v("Collie","MainActivity "+start);
         super.onCreate(savedInstanceState);
 
 
@@ -48,10 +50,20 @@ public class MainActivity extends BaseActivity {
                 Intent mIntent=new Intent(MainActivity.this, FpsTestActivity.class);
                 startActivity(mIntent);
             }
-
-
         });
+        Log.v("Collie","MainActivity "+(SystemClock.uptimeMillis()-start));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.v("Collie","MainActivity "+(SystemClock.uptimeMillis()-start));
 
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        Log.v("Collie","MainActivity "+(SystemClock.uptimeMillis()-start));
+   }
 }

@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.SystemClock;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,7 @@ public class LauncherHelpProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+        Log.v("Collie","LauncherHelpProvider");
         return false;
     }
 
