@@ -126,11 +126,11 @@ public class LauncherTracker implements ITracker {
 
     private Set<ILaunchTrackListener> mILaucherTrackListenerSet = new HashSet<>();
 
-    public void addILaucherTrackListener(ILaunchTrackListener laucherTrackListener) {
+    public void addLaunchTrackListener(ILaunchTrackListener laucherTrackListener) {
         mILaucherTrackListenerSet.add(laucherTrackListener);
     }
 
-    public void removeILaucherTrackListener(ILaunchTrackListener laucherTrackListener) {
+    public void removeLaunchTrackListener(ILaunchTrackListener laucherTrackListener) {
         mILaucherTrackListenerSet.remove(laucherTrackListener);
     }
 

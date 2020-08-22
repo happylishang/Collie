@@ -183,7 +183,7 @@ public class Collie {
         if (config.userBatteryTrack) {
             BatteryStatsTracker.getInstance().startTrack(application);
         }
-        LauncherTracker.getInstance().addILaucherTrackListener(new LauncherTracker.ILaunchTrackListener() {
+        LauncherTracker.getInstance().addLaunchTrackListener(new LauncherTracker.ILaunchTrackListener() {
             @Override
             public void onColdLaunchCost(long duration) {
                 Log.v("Collie", "cold " + duration);
