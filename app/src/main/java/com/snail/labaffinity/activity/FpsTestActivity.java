@@ -65,6 +65,22 @@ public class FpsTestActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        LogUtils.v("onResume");
+        LogUtils.v("onResume " +SystemClock.uptimeMillis());
     }
+
+    //  第一帧的显示点，基本是在这里
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        LogUtils.v("onWindowFocusChanged " + SystemClock.uptimeMillis());
+        super.onWindowFocusChanged(hasFocus);
+    }
+
+    protected void onPostResume() {
+
+        super.onPostResume();
+        LogUtils.v("onPostResumem" +SystemClock.uptimeMillis());
+
+    }
+
+
 }

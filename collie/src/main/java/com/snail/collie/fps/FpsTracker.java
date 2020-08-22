@@ -246,4 +246,5 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         mActivityCollectItemHashMap.clear();
         mStartTime = 0;
     }
+
 }

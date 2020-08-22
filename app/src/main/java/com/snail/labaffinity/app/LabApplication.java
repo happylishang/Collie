@@ -2,6 +2,7 @@ package com.snail.labaffinity.app;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.google.firebase.analytics.FirebaseAnalytics;

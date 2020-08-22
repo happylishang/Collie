@@ -3,6 +3,7 @@ package com.snail.labaffinity.activity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.View;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -17,6 +18,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
 

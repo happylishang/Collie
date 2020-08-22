@@ -2,6 +2,8 @@ package com.snail.collie;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.ComponentCallbacks;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -17,6 +19,7 @@ import com.snail.collie.fps.FpsTracker;
 import com.snail.collie.fps.ITrackFpsListener;
 import com.snail.collie.mem.MemoryLeakTrack;
 import com.snail.collie.mem.TrackMemoryInfo;
+import com.snail.collie.startup.LauncherTrack;
 import com.snail.collie.trafficstats.ITrackTrafficStatsListener;
 import com.snail.collie.trafficstats.TrafficStatsTracker;
 
@@ -182,8 +185,19 @@ public class Collie {
         if (config.userBatteryTrack) {
             BatteryStatsTrack.getInstance().startTrack(application);
         }
+        LauncherTrack.getInstance().addILaucherTrackListener(new LauncherTrack.ILaucherTrackListener() {
+            @Override
+            public void onColdLaucherCost(long duration) {
+                Log.v("Collie","cold " + duration);
+            }
 
+            @Override
+            public void onActivityStartCost(Activity activity,long duration) {
+                Log.v("Collie","activity " +activity+" "+ duration);
 
+            }
+        });
+        LauncherTrack.getInstance().startTrack(application);
     }
 
     public void registerCollieListener(CollieListener listener) {

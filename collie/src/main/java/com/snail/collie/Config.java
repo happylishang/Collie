@@ -7,4 +7,6 @@ public class Config {
     public boolean userTrafficTrack = true;//流量监控
     public boolean userMemTrack = true;//Activity泄露及内存情况
     public boolean userBatteryTrack = true;//电量
+    public boolean userStartUpTrack = true;//电量
+
 }

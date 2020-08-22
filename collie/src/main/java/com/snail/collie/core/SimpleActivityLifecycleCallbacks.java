@@ -42,4 +42,5 @@ public class SimpleActivityLifecycleCallbacks implements Application.ActivityLif
     public void onActivityDestroyed(@NonNull Activity activity) {
 
     }
+
 }
