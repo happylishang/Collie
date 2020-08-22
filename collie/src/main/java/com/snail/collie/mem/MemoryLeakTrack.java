@@ -23,7 +23,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -31,8 +30,6 @@ import java.util.WeakHashMap;
 public class MemoryLeakTrack implements ITracker {
 
     private static volatile MemoryLeakTrack sInstance = null;
-    private long mStep;
-    private static int M = 1024 * 1024;
 
     private MemoryLeakTrack() {
     }
@@ -60,14 +57,6 @@ public class MemoryLeakTrack implements ITracker {
         @Override
         public void onActivityStopped(@NonNull final Activity activity) {
             super.onActivityStopped(activity);
-            if (mStep++ % 3 == 0) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        collectMemoryInfo(activity.getApplication());
-                    }
-                });
-            }
             //  退后台，GC 找LeakActivity
             if (!ActivityStack.getInstance().isInBackGround()) {
                 return;
@@ -94,7 +83,7 @@ public class MemoryLeakTrack implements ITracker {
                         }
                         if (mMemoryLeakListeners.size() > 0) {
                             for (Map.Entry<String, Integer> entry : hashMap.entrySet()) {
-                                for (ITrackMemoryLeakListener listener : mMemoryLeakListeners) {
+                                for (ITrackMemoryListener listener : mMemoryLeakListeners) {
                                     listener.onLeakActivity(entry.getKey(), entry.getValue());
                                 }
                             }
@@ -107,13 +96,26 @@ public class MemoryLeakTrack implements ITracker {
     };
 
     @Override
-    public void destroy(Application application) {
+    public void destroy(final Application application) {
         Collie.getInstance().removeActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
-    public void startTrack(Application application) {
+    public void startTrack(final Application application) {
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mMemoryLeakListeners.size() > 0) {
+                    TrackMemoryInfo trackMemoryInfo = collectMemoryInfo(application);
+                    for (ITrackMemoryListener listener : mMemoryLeakListeners) {
+                        listener.onCurrentMemoryCost(trackMemoryInfo);
+                    }
+                }
+                mHandler.postDelayed(this, 3 * 1000);
+            }
+        }, 3 * 1000);
     }
 
     @Override
@@ -121,18 +123,21 @@ public class MemoryLeakTrack implements ITracker {
 
     }
 
-    private Set<ITrackMemoryLeakListener> mMemoryLeakListeners = new HashSet<>();
+    private Set<ITrackMemoryListener> mMemoryLeakListeners = new HashSet<>();
 
-    public void addOnMemoryLeakListener(ITrackMemoryLeakListener leakListener) {
+    public void addOnMemoryLeakListener(ITrackMemoryListener leakListener) {
         mMemoryLeakListeners.add(leakListener);
     }
 
-    public void removeOnMemoryLeakListener(ITrackMemoryLeakListener leakListener) {
+    public void removeOnMemoryLeakListener(ITrackMemoryListener leakListener) {
         mMemoryLeakListeners.remove(leakListener);
     }
 
-    public interface ITrackMemoryLeakListener {
+    public interface ITrackMemoryListener {
+
         void onLeakActivity(String activity, int count);
+
+        void onCurrentMemoryCost(TrackMemoryInfo trackMemoryInfo);
     }
 
     private static String display;
@@ -154,28 +159,24 @@ public class MemoryLeakTrack implements ITracker {
 
         //java内存
         Runtime rt = Runtime.getRuntime();
-        JavaMemory javaMemory = new JavaMemory();
-        javaMemory.freeMemory = rt.freeMemory() >> 20;
-        javaMemory.maxMemory = rt.maxMemory() >> 20;
-        javaMemory.totalMemory = rt.totalMemory() >> 20;
 
         //进程Native内存
 
-        NativeMemory nativeMemory = new NativeMemory();
+        AppMemory appMemory = new AppMemory();
         Debug.MemoryInfo debugMemoryInfo = new Debug.MemoryInfo();
         Debug.getMemoryInfo(debugMemoryInfo);
-
-        nativeMemory.nativeHeapAllocatedSize = Debug.getNativeHeapAllocatedSize() >> 20;
-        nativeMemory.nativeHeapFreeSize = Debug.getNativeHeapFreeSize() >> 20;
-        nativeMemory.nativeHeapSize = Debug.getNativeHeapSize() >> 20;
+        appMemory.nativePss = debugMemoryInfo.nativePss >> 10;
+        appMemory.dalvikPss = debugMemoryInfo.dalvikPss >> 10;
+        appMemory.totalPss = debugMemoryInfo.getTotalPss() >> 10;
+        appMemory.mMemoryInfo = debugMemoryInfo;
 
         TrackMemoryInfo trackMemoryInfo = new TrackMemoryInfo();
-        trackMemoryInfo.javaMemory = javaMemory;
         trackMemoryInfo.systemMemoryInfo = systemMemory;
-        trackMemoryInfo.nativeMemory = nativeMemory;
+        trackMemoryInfo.appMemory = appMemory;
 
         trackMemoryInfo.procName = getProcessName(Process.myPid());
         trackMemoryInfo.display = display;
+
         return trackMemoryInfo;
     }
 

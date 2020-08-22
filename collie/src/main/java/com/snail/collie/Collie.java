@@ -16,6 +16,7 @@ import com.snail.collie.debug.DebugHelper;
 import com.snail.collie.fps.FpsTracker;
 import com.snail.collie.fps.ITrackFpsListener;
 import com.snail.collie.mem.MemoryLeakTrack;
+import com.snail.collie.mem.TrackMemoryInfo;
 import com.snail.collie.trafficstats.ITrackTrafficStatsListener;
 import com.snail.collie.trafficstats.TrafficStatsTracker;
 
@@ -29,7 +30,7 @@ public class Collie {
     private Handler mHandler;
     private ITrackFpsListener mITrackListener;
     private ITrackTrafficStatsListener mTrackTrafficStatsListener;
-    private MemoryLeakTrack.ITrackMemoryLeakListener mITrackMemoryLeakListener;
+    private MemoryLeakTrack.ITrackMemoryListener mITrackMemoryLeakListener;
 
     private List<CollieListener> mCollieListeners = new ArrayList<>();
     private HashSet<Application.ActivityLifecycleCallbacks> mActivityLifecycleCallbacks = new HashSet<>();
@@ -68,10 +69,17 @@ public class Collie {
             }
         };
 
-        mITrackMemoryLeakListener = new MemoryLeakTrack.ITrackMemoryLeakListener() {
+        mITrackMemoryLeakListener = new MemoryLeakTrack.ITrackMemoryListener() {
             @Override
             public void onLeakActivity(String activity, int count) {
                 Log.v("Collie", "内存泄露 " + activity + " 数量 " + count);
+            }
+
+            @Override
+            public void onCurrentMemoryCost(TrackMemoryInfo trackMemoryInfo) {
+                Log.v("Collie", "内存  " + trackMemoryInfo.procName + " java内存  "
+                        +trackMemoryInfo.appMemory.dalvikPss + " native内存  "+
+                        trackMemoryInfo.appMemory.nativePss);
             }
         };
     }
