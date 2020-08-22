@@ -42,7 +42,7 @@ public class Collie {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
         mITrackListener = new ITrackFpsListener() {
             @Override
-            public void onFpsTrack(final  Activity activity,final long currentCostMils, final long currentDropFrame, final boolean isInFrameDraw, final long averageFps) {
+            public void onFpsTrack(final Activity activity, final long currentCostMils, final long currentDropFrame, final boolean isInFrameDraw, final long averageFps) {
                 final long currentFps = currentCostMils == 0 ? 60 : Math.min(60, 1000 / currentCostMils);
 //                Log.v("Collie", "实时帧率 " + currentFps + " 掉帧 " + currentDropFrame + " 1S平均帧率 " + averageFps + " 本次耗时 " + currentCostMils);
                 mHandler.post(new Runnable() {
@@ -57,7 +57,7 @@ public class Collie {
                         }
 
                         for (CollieListener collieListener : mCollieListeners) {
-                            collieListener.onFpsTrack(activity, currentFps, currentDropFrame, averageFps);
+                            collieListener.onFpsTrack(activity, currentCostMils, currentDropFrame, isInFrameDraw, averageFps);
                         }
                     }
 
@@ -81,7 +81,7 @@ public class Collie {
             @Override
             public void onCurrentMemoryCost(TrackMemoryInfo trackMemoryInfo) {
                 Log.v("Collie", "内存  " + trackMemoryInfo.procName + " java内存  "
-                        +trackMemoryInfo.appMemory.dalvikPss + " native内存  "+
+                        + trackMemoryInfo.appMemory.dalvikPss + " native内存  " +
                         trackMemoryInfo.appMemory.nativePss);
             }
         };
@@ -188,12 +188,12 @@ public class Collie {
         LauncherTrack.getInstance().addILaucherTrackListener(new LauncherTrack.ILaucherTrackListener() {
             @Override
             public void onColdLaucherCost(long duration) {
-                Log.v("Collie","cold " + duration);
+                Log.v("Collie", "cold " + duration);
             }
 
             @Override
-            public void onActivityStartCost(Activity activity,long duration) {
-                Log.v("Collie","activity启动耗时 " +activity+" "+ duration);
+            public void onActivityStartCost(Activity activity, long duration) {
+                Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
 
             }
         });
