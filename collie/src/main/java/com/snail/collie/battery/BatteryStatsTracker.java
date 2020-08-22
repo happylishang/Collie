@@ -20,20 +20,20 @@ import com.snail.collie.debug.DebugHelper;
 
 import java.util.HashMap;
 
-public class BatteryStatsTrack implements ITracker {
-    private static BatteryStatsTrack sInstance;
+public class BatteryStatsTracker implements ITracker {
+    private static BatteryStatsTracker sInstance;
     private Handler mHandler;
     private String display;
 
-    private BatteryStatsTrack() {
+    private BatteryStatsTracker() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
     }
 
-    public static BatteryStatsTrack getInstance() {
+    public static BatteryStatsTracker getInstance() {
         if (sInstance == null) {
             synchronized (DebugHelper.class) {
                 if (sInstance == null) {
-                    sInstance = new BatteryStatsTrack();
+                    sInstance = new BatteryStatsTracker();
                 }
             }
         }

@@ -42,12 +42,12 @@ public class LabApplication extends Application {
             }
 
             @Override
-            public void onColdLaucherCost(long duration) {
+            public void onColdLaunchCost(long duration) {
 
             }
 
             @Override
-            public void onActivityStartCost(Activity activity, long duration) {
+            public void onActivityLaunchCost(Activity activity, long duration) {
 
             }
 

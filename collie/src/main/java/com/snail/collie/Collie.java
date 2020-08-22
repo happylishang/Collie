@@ -2,8 +2,6 @@ package com.snail.collie;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.ComponentCallbacks;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -11,7 +9,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snail.collie.battery.BatteryStatsTrack;
+import com.snail.collie.battery.BatteryStatsTracker;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.debug.DebugHelper;
@@ -19,7 +17,7 @@ import com.snail.collie.fps.FpsTracker;
 import com.snail.collie.fps.ITrackFpsListener;
 import com.snail.collie.mem.MemoryLeakTrack;
 import com.snail.collie.mem.TrackMemoryInfo;
-import com.snail.collie.startup.LauncherTrack;
+import com.snail.collie.startup.LauncherTracker;
 import com.snail.collie.trafficstats.ITrackTrafficStatsListener;
 import com.snail.collie.trafficstats.TrafficStatsTracker;
 
@@ -183,21 +181,21 @@ public class Collie {
         }
 
         if (config.userBatteryTrack) {
-            BatteryStatsTrack.getInstance().startTrack(application);
+            BatteryStatsTracker.getInstance().startTrack(application);
         }
-        LauncherTrack.getInstance().addILaucherTrackListener(new LauncherTrack.ILaucherTrackListener() {
+        LauncherTracker.getInstance().addILaucherTrackListener(new LauncherTracker.ILaucherTrackListener() {
             @Override
-            public void onColdLaucherCost(long duration) {
+            public void onColdLaunchCost(long duration) {
                 Log.v("Collie", "cold " + duration);
             }
 
             @Override
-            public void onActivityStartCost(Activity activity, long duration) {
+            public void onActivityLaunchCost(Activity activity, long duration) {
                 Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
 
             }
         });
-        LauncherTrack.getInstance().startTrack(application);
+        LauncherTracker.getInstance().startTrack(application);
     }
 
     public void registerCollieListener(CollieListener listener) {

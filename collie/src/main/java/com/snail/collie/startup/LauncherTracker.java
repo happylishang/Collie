@@ -5,7 +5,6 @@ import android.app.Application;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 
@@ -23,20 +22,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class LauncherTrack implements ITracker {
+public class LauncherTracker implements ITracker {
 
-    private static LauncherTrack sInstance;
+    private static LauncherTracker sInstance;
     private Handler mHandler;
 
-    private LauncherTrack() {
+    private LauncherTracker() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
     }
 
-    public static LauncherTrack getInstance() {
+    public static LauncherTracker getInstance() {
         if (sInstance == null) {
             synchronized (DebugHelper.class) {
                 if (sInstance == null) {
-                    sInstance = new LauncherTrack();
+                    sInstance = new LauncherTracker();
                 }
             }
         }
@@ -93,11 +92,11 @@ public class LauncherTrack implements ITracker {
                             public void run() {
                                 if (isColdStarUp) {
                                     for (ILaucherTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
-                                        launcherTrackListener.onColdLaucherCost(coldLauncherTime);
+                                        launcherTrackListener.onColdLaunchCost(coldLauncherTime);
                                     }
                                 }
                                 for (ILaucherTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
-                                    launcherTrackListener.onActivityStartCost(activity, activityLauncherTime);
+                                    launcherTrackListener.onActivityLaunchCost(activity, activityLauncherTime);
                                 }
 
                             }
@@ -137,8 +136,8 @@ public class LauncherTrack implements ITracker {
 
     public interface ILaucherTrackListener {
 
-        void onColdLaucherCost(long duration);
+        void onColdLaunchCost(long duration);
 
-        void onActivityStartCost(Activity activity, long duration);
+        void onActivityLaunchCost(Activity activity, long duration);
     }
 }
