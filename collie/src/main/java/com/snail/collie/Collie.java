@@ -50,7 +50,7 @@ public class Collie {
                     public void run() {
 
                         if (BuildConfig.DEBUG) {
-                            if (currentDropFrame > 0)
+                            if (currentDropFrame > 1)
                                 DebugHelper.getInstance().update("实时fps " + currentFps +
                                         "\n 丢帧 " + currentDropFrame + " \n1s平均fps " + averageFps
                                         + " \n本次耗时 " + currentCostMils);
@@ -193,7 +193,7 @@ public class Collie {
 
             @Override
             public void onActivityStartCost(Activity activity,long duration) {
-                Log.v("Collie","activity " +activity+" "+ duration);
+                Log.v("Collie","activity启动耗时 " +activity+" "+ duration);
 
             }
         });

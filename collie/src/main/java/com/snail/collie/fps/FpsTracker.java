@@ -2,11 +2,14 @@ package com.snail.collie.fps;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.Choreographer;
+import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snail.collie.BuildConfig;
 import com.snail.collie.Collie;
@@ -16,6 +19,7 @@ import com.snail.collie.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.collie.debug.DebugHelper;
+import com.snail.collie.startup.LauncherHelpProvider;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -71,16 +75,31 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     private boolean mInDoFrame = false;
     private SimpleActivityLifecycleCallbacks mSimpleActivityLifecycleCallbacks = new SimpleActivityLifecycleCallbacks() {
 
+
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
             super.onActivityPaused(activity);
             pauseTrack(activity.getApplication());
         }
 
+        // 帧率不统计第一帧
         @Override
-        public void onActivityResumed(@NonNull Activity activity) {
+        public void onActivityResumed(@NonNull final Activity activity) {
             super.onActivityResumed(activity);
-            resumeTrack();
+            activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+                /**
+                 * Called when the current {@link Window } of the activity gains or loses* focus.  This is the best indicator of whether this activity is visible
+                 * to the user.  The default implementation clears the key tracking
+                 * state, so should always be called.
+                 */
+                @Override
+                public void onWindowFocusChanged(boolean b) {
+                    if (b) {
+                        resumeTrack();
+                        activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
+                    }
+                }
+            });
         }
     };
 
