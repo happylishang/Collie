@@ -113,9 +113,9 @@ public class MemoryLeakTrack implements ITracker {
                         listener.onCurrentMemoryCost(trackMemoryInfo);
                     }
                 }
-                mHandler.postDelayed(this, 3 * 1000);
+                mHandler.postDelayed(this, 30 * 1000);
             }
-        }, 3 * 1000);
+        }, 30 * 1000);
     }
 
     @Override
