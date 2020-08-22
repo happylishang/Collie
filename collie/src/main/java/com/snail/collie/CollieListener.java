@@ -2,8 +2,11 @@ package com.snail.collie;
 
 import android.app.Activity;
 
-public interface CollieListener {
+import com.snail.collie.fps.ITrackFpsListener;
+import com.snail.collie.mem.MemoryLeakTrack;
+import com.snail.collie.startup.LauncherTrack;
+import com.snail.collie.trafficstats.ITrackTrafficStatsListener;
 
-   void onFpsTrack(Activity activity, long currentFps, long currentDropFrame, long averageFps);
+public interface CollieListener extends LauncherTrack.ILaucherTrackListener, ITrackFpsListener, MemoryLeakTrack.ITrackMemoryListener, ITrackTrafficStatsListener {
 
 }

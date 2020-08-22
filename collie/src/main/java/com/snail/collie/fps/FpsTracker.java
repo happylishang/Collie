@@ -2,31 +2,24 @@ package com.snail.collie.fps;
 
 import android.app.Activity;
 import android.app.Application;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.Choreographer;
 import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.snail.collie.BuildConfig;
 import com.snail.collie.Collie;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
-import com.snail.collie.debug.DebugHelper;
-import com.snail.collie.startup.LauncherHelpProvider;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 public class FpsTracker extends LooperMonitor.LooperDispatchListener implements ITracker {
 
@@ -162,7 +155,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
                     for (ITrackFpsListener item : mITrackListeners) {
                         if (collectItem.sumFrame > 10) {
                             long averageFps = Math.min(60, collectItem.sumCost > 0 ? collectItem.sumFrame * 1000 / collectItem.sumCost : 60);
-                            item.onHandlerMessageCost(cost, cost <= 16 ? 0 : Math.max(1, cost / 16 - 1), inDoFrame, averageFps);
+                            item.onFpsTrack(activity,cost, cost <= 16 ? 0 : Math.max(1, cost / 16 - 1), inDoFrame, averageFps);
                         }
                     }
                     //   不过度累积

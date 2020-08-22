@@ -42,7 +42,7 @@ public class Collie {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
         mITrackListener = new ITrackFpsListener() {
             @Override
-            public void onHandlerMessageCost(final long currentCostMils, final long currentDropFrame, final boolean isInFrameDraw, final long averageFps) {
+            public void onFpsTrack(final  Activity activity,final long currentCostMils, final long currentDropFrame, final boolean isInFrameDraw, final long averageFps) {
                 final long currentFps = currentCostMils == 0 ? 60 : Math.min(60, 1000 / currentCostMils);
 //                Log.v("Collie", "实时帧率 " + currentFps + " 掉帧 " + currentDropFrame + " 1S平均帧率 " + averageFps + " 本次耗时 " + currentCostMils);
                 mHandler.post(new Runnable() {
@@ -57,7 +57,7 @@ public class Collie {
                         }
 
                         for (CollieListener collieListener : mCollieListeners) {
-                            collieListener.onFpsTrack(ActivityStack.getInstance().getTopActivity(), currentFps, currentDropFrame, averageFps);
+                            collieListener.onFpsTrack(activity, currentFps, currentDropFrame, averageFps);
                         }
                     }
 
