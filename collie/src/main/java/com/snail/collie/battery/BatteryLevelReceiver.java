@@ -11,13 +11,15 @@ public class BatteryLevelReceiver extends BroadcastReceiver {
     private int level;
     private int scale;
     private boolean isCharging;
-
+    private int voltage;
     @Override
     public void onReceive(Context context, Intent intent) {
         //当前剩余电量
         level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         //电量最大值
         scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
 
         int status = intent.getIntExtra("status", 0);
         isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
@@ -30,6 +32,9 @@ public class BatteryLevelReceiver extends BroadcastReceiver {
 
     public int getTotalBatteryPercent() {
         return scale;
+    }
+    public int getVoltage() {
+        return voltage;
     }
 
     public boolean isCharging() {

@@ -9,6 +9,7 @@ public class BatteryInfo {
     public float cost;
     public long duration;
     public String display;
-    public String total;
+    public int total;
+    public int voltage;
     public float screenBrightness;
 }

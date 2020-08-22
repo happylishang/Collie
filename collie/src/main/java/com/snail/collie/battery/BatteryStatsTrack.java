@@ -12,6 +12,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
+import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
@@ -49,13 +50,16 @@ public class BatteryStatsTrack implements ITracker {
                 batteryInfo = new BatteryInfo();
                 mBatteryInfoHashMap.put(activity, batteryInfo);
             }
-            final BatteryInfo batteryInfoBack = batteryInfo;
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    computeBatteryInfo(activity, batteryInfoBack);
-                }
-            });
+            if (ActivityStack.getInstance().isInBackGround()) {
+                final BatteryInfo batteryInfoBack = batteryInfo;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        computeBatteryInfo(activity, batteryInfoBack);
+                    }
+                });
+            }
+
         }
 
         @Override
@@ -73,7 +77,7 @@ public class BatteryStatsTrack implements ITracker {
     };
 
     private long lastTimeStamp;
-    private int lastPercent;
+    private float lastPercent;
 
     @Override
     public void destroy(Application application) {
@@ -100,20 +104,22 @@ public class BatteryStatsTrack implements ITracker {
 
     }
 
+    //    似乎并没有必要按照Activity统计耗点，每个界面很难超过1%
     private BatteryInfo computeBatteryInfo(Activity activity, @NonNull BatteryInfo info) {
-        info.activityName = activity.getClass().getSimpleName();
+//        info.activityName = activity.getClass().getSimpleName();
 
         if (TextUtils.isEmpty(display)) {
             display = "" + activity.getResources().getDisplayMetrics().widthPixels + "*" + activity.getResources().getDisplayMetrics().heightPixels;
         }
-
         BatteryInfo batteryInfo = new BatteryInfo();
         batteryInfo.charging = mBatteryLevelReceiver.isCharging();
-        batteryInfo.cost = mBatteryLevelReceiver.isCharging() ? 0 : batteryInfo.cost + (lastPercent - mBatteryLevelReceiver.getCurrentBatteryLevel());
+        batteryInfo.cost = mBatteryLevelReceiver.isCharging() || lastPercent < 1 ? 0 : batteryInfo.cost + (lastPercent - mBatteryLevelReceiver.getCurrentBatteryLevel());
         batteryInfo.duration += SystemClock.uptimeMillis() - lastTimeStamp;
         batteryInfo.screenBrightness = activity.getWindow().getAttributes().screenBrightness;
         batteryInfo.display = display;
-        Log.v("Battery", "" + batteryInfo.duration + " cost " + batteryInfo.cost);
+        batteryInfo.total = mBatteryLevelReceiver.getTotalBatteryPercent();
+        batteryInfo.voltage = mBatteryLevelReceiver.getVoltage();
+        Log.v("Battery",  "total " + batteryInfo.total + "用时间 " + batteryInfo.duration/1000 + "耗电  " + batteryInfo.cost);
         return batteryInfo;
     }
 
