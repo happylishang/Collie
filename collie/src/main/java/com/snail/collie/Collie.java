@@ -5,6 +5,7 @@ import android.app.Application;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,7 +33,7 @@ public class Collie {
     private ITrackFpsListener mITrackListener;
     private ITrackTrafficStatsListener mTrackTrafficStatsListener;
     private MemoryLeakTrack.ITrackMemoryListener mITrackMemoryLeakListener;
-
+    private LauncherTracker.ILaunchTrackListener mILaunchTrackListener;
     private List<CollieListener> mCollieListeners = new ArrayList<>();
     private HashSet<Application.ActivityLifecycleCallbacks> mActivityLifecycleCallbacks = new HashSet<>();
 
@@ -81,6 +82,20 @@ public class Collie {
                 Log.v("Collie", "内存  " + trackMemoryInfo.procName + " java内存  "
                         + trackMemoryInfo.appMemory.dalvikPss + " native内存  " +
                         trackMemoryInfo.appMemory.nativePss);
+            }
+        };
+        mILaunchTrackListener = new LauncherTracker.ILaunchTrackListener() {
+            @Override
+            public void onColdLaunchCost(long duration) {
+                Log.v("Collie", "cold " + duration);
+            }
+
+            @Override
+            public void onActivityLaunchCost(Activity activity, long duration) {
+                Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
+                if(duration>800){
+                    Toast.makeText(activity,"耗时 "+duration+"ms",Toast.LENGTH_SHORT).show();
+                }
             }
         };
     }
@@ -183,18 +198,7 @@ public class Collie {
         if (config.userBatteryTrack) {
             BatteryStatsTracker.getInstance().startTrack(application);
         }
-        LauncherTracker.getInstance().addLaunchTrackListener(new LauncherTracker.ILaunchTrackListener() {
-            @Override
-            public void onColdLaunchCost(long duration) {
-                Log.v("Collie", "cold " + duration);
-            }
-
-            @Override
-            public void onActivityLaunchCost(Activity activity, long duration) {
-                Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
-
-            }
-        });
+        LauncherTracker.getInstance().addLaunchTrackListener(mILaunchTrackListener);
         LauncherTracker.getInstance().startTrack(application);
     }
 

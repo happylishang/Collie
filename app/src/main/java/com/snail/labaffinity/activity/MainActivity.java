@@ -26,13 +26,19 @@ public class MainActivity extends BaseActivity {
 
         mResultProfileBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mResultProfileBinding.getRoot());
-        mResultProfileBinding.contentMain1.first.setOnClickListener(new View.OnClickListener() {
+
+        mResultProfileBinding.contentMain1.activityStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mIntent=new Intent( MainActivity.this, LeakTestActivity.class);
+                Intent mIntent=new Intent( MainActivity.this, LauncherTestActivity.class);
                 startActivity(mIntent);
-
             }
+        });
+
+        mResultProfileBinding.contentMain1.first.setOnClickListener(v -> {
+            Intent mIntent=new Intent( MainActivity.this, LeakTestActivity.class);
+            startActivity(mIntent);
+
         });
         mResultProfileBinding.contentMain1.second.setOnClickListener(new View.OnClickListener() {
             @Override

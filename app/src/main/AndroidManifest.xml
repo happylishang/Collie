@@ -37,6 +37,7 @@
         <activity android:name=".activity.TrafficTestActivity" />
         <activity android:name=".activity.LeakTestActivity"
             />
+        <activity android:name=".activity.LauncherTestActivity" />
 
         <service android:name=".service.BackGroundService"
            />

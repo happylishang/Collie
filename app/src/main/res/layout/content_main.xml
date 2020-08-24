@@ -23,6 +23,11 @@
             android:orientation="vertical">
 
             <Button
+                android:id="@+id/activity_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="测试Activity启动耗时"/>
+            <Button
                 android:id="@+id/first"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
