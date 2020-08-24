@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Process;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -54,6 +55,7 @@ public class MemoryLeakTrack implements ITracker {
             mActivityStringWeakHashMap.put(activity, activity.getClass().getSimpleName());
         }
 
+
         @Override
         public void onActivityStopped(@NonNull final Activity activity) {
             super.onActivityStopped(activity);
@@ -69,6 +71,15 @@ public class MemoryLeakTrack implements ITracker {
                         if (!ActivityStack.getInstance().isInBackGround()) {
                             return;
                         }
+                        try {
+                            //   申请个稍微大的对象，促进GC
+                            byte[] leakHelpBytes = new byte[4 * 1024 * 1024];
+                            for (int i = 0; i < leakHelpBytes.length; i += 1024) {
+                                leakHelpBytes[i] = 1;
+                            }
+                        } catch (Throwable ignored) {
+                        }
+                        Runtime.getRuntime().gc();
                         SystemClock.sleep(100);
                         System.runFinalization();
                         HashMap<String, Integer> hashMap = new HashMap<>();
