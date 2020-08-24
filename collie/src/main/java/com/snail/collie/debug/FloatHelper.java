@@ -72,7 +72,6 @@ public class FloatHelper {
         if (mChild != view) {
             mChild = view;
             mNeedReload = true;
-            checkSetupWindow();
         }
         return this;
     }
@@ -178,7 +177,7 @@ public class FloatHelper {
 
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + activity.getPackageName()));
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent,1000);
         return true;
     }
 
@@ -251,14 +250,14 @@ public class FloatHelper {
             try {
                 mWindowManager.updateViewLayout(this, mLayoutParams);
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, e.getMessage());
                 mWindowManager.addView(this, mLayoutParams);
             }
             mIsShowing = true;
         }
 
         public void close() {
-            if (mWindowManager != null) {
+
+            if (mWindowManager != null && isShowing()) {
                 mWindowManager.removeView(this);
                 removeAllViews();
             }
