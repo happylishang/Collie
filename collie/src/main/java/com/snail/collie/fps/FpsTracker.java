@@ -106,7 +106,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     public void dispatchStart() {
         super.dispatchStart();
         mStartTime = SystemClock.uptimeMillis();
-//        Log.v("Collie", "start");
     }
 
 
@@ -119,7 +118,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         super.dispatchEnd();
         if (mStartTime > 0) {
             long cost = SystemClock.uptimeMillis() - mStartTime;
-//            Log.v("Collie", "end " + cost);
             collectInfoAndDispatch(ActivityStack.getInstance().getTopActivity(), cost, mInDoFrame);
             if (mInDoFrame) {
                 addFrameCallBack();

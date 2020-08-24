@@ -92,7 +92,7 @@ public class LauncherTracker implements ITracker {
                             public void run() {
                                 if (isColdStarUp) {
                                     for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
-                                        launcherTrackListener.onColdLaunchCost(coldLauncherTime);
+                                        launcherTrackListener.onAppColdLaunchCost(coldLauncherTime);
                                     }
                                 }
                                 for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
@@ -136,7 +136,7 @@ public class LauncherTracker implements ITracker {
 
     public interface ILaunchTrackListener {
 
-        void onColdLaunchCost(long duration);
+        void onAppColdLaunchCost(long duration);
 
         void onActivityLaunchCost(Activity activity, long duration);
     }

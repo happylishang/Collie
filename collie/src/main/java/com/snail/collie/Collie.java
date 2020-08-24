@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,7 +41,6 @@ public class Collie {
             @Override
             public void onFpsTrack(final Activity activity, final long currentCostMils, final long currentDropFrame, final boolean isInFrameDraw, final long averageFps) {
                 final long currentFps = currentCostMils == 0 ? 60 : Math.min(60, 1000 / currentCostMils);
-//                Log.v("Collie", "实时帧率 " + currentFps + " 掉帧 " + currentDropFrame + " 1S平均帧率 " + averageFps + " 本次耗时 " + currentCostMils);
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -67,34 +64,49 @@ public class Collie {
         mTrackTrafficStatsListener = new ITrackTrafficStatsListener() {
             @Override
             public void onTrafficStats(String activityName, long value) {
-                Log.v("Collie", "" + activityName + " 流量消耗 " + value * 1.0f / (1024 * 1024) + "M");
+                for (CollieListener collieListener : mCollieListeners) {
+                    collieListener.onTrafficStats(activityName, value);
+                }
+//                Log.v("Collie", "" + activityName + " 流量消耗 " + value * 1.0f / (1024 * 1024) + "M");
             }
         };
 
         mITrackMemoryLeakListener = new MemoryLeakTrack.ITrackMemoryListener() {
             @Override
             public void onLeakActivity(String activity, int count) {
-                Log.v("Collie", "内存泄露 " + activity + " 数量 " + count);
+//                Log.v("Collie", "内存泄露 " + activity + " 数量 " + count);
+                for (CollieListener collieListener : mCollieListeners) {
+                    collieListener.onLeakActivity(activity, count);
+                }
             }
 
             @Override
             public void onCurrentMemoryCost(TrackMemoryInfo trackMemoryInfo) {
-                Log.v("Collie", "内存  " + trackMemoryInfo.procName + " java内存  "
-                        + trackMemoryInfo.appMemory.dalvikPss + " native内存  " +
-                        trackMemoryInfo.appMemory.nativePss);
+//                Log.v("Collie", "内存  " + trackMemoryInfo.procName + " java内存  "
+//                        + trackMemoryInfo.appMemory.dalvikPss + " native内存  " +
+//                        trackMemoryInfo.appMemory.nativePss);
+                for (CollieListener collieListener : mCollieListeners) {
+                    collieListener.onCurrentMemoryCost(trackMemoryInfo);
+                }
             }
         };
         mILaunchTrackListener = new LauncherTracker.ILaunchTrackListener() {
             @Override
-            public void onColdLaunchCost(long duration) {
-                Log.v("Collie", "cold " + duration);
+            public void onAppColdLaunchCost(long duration) {
+//                Log.v("Collie", "cold " + duration);
+                for (CollieListener collieListener : mCollieListeners) {
+                    collieListener.onAppColdLaunchCost(duration);
+                }
             }
 
             @Override
             public void onActivityLaunchCost(Activity activity, long duration) {
-                Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
-                if(duration>800){
-                    Toast.makeText(activity,"耗时 "+duration+"ms",Toast.LENGTH_SHORT).show();
+////                Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
+//                if(duration>800){
+//                    Toast.makeText(activity,"耗时 "+duration+"ms",Toast.LENGTH_SHORT).show();
+//                }
+                for (CollieListener collieListener : mCollieListeners) {
+                    collieListener.onActivityLaunchCost(activity, duration);
                 }
             }
         };

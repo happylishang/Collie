@@ -17,7 +17,6 @@ public class LauncherHelpProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        Log.v("Collie","LauncherHelpProvider");
         return false;
     }
 
