@@ -223,7 +223,6 @@ public class FloatHelper {
             mLayoutParams.height = mInitHeight;
             mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                     | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                    | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
                     | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 mLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
