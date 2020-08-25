@@ -78,10 +78,8 @@ public class DebugHelper implements ITracker {
     }
 
     public void hide() {
-        if (BuildConfig.DEBUG) {
             if (mFloatHelper != null) {
                 mFloatHelper.destroy();
-            }
         }
     }
 

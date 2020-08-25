@@ -45,12 +45,10 @@ public class Collie {
                     @Override
                     public void run() {
 
-                        if (BuildConfig.DEBUG) {
-                            if (currentDropFrame > 1)
-                                DebugHelper.getInstance().update("实时fps " + currentFps +
-                                        "\n 丢帧 " + currentDropFrame + " \n1s平均fps " + averageFps
-                                        + " \n本次耗时 " + currentCostMils);
-                        }
+                        if (currentDropFrame > 1)
+                            DebugHelper.getInstance().update("实时fps " + currentFps +
+                                    "\n 丢帧 " + currentDropFrame + " \n1s平均fps " + averageFps
+                                    + " \n本次耗时 " + currentCostMils);
 
                         for (CollieListener collieListener : mCollieListeners) {
                             collieListener.onFpsTrack(activity, currentCostMils, currentDropFrame, isInFrameDraw, averageFps);
