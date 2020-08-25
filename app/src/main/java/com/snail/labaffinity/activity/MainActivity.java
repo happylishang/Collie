@@ -20,7 +20,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.v("Collie","MainActivity "+start);
         super.onCreate(savedInstanceState);
 
 
@@ -57,19 +56,16 @@ public class MainActivity extends BaseActivity {
                 startActivity(mIntent);
             }
         });
-        Log.v("Collie","MainActivity "+(SystemClock.uptimeMillis()-start));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.v("Collie","MainActivity "+(SystemClock.uptimeMillis()-start));
 
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        Log.v("Collie","MainActivity "+(SystemClock.uptimeMillis()-start));
    }
 }

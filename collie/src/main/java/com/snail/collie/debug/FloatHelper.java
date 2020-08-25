@@ -263,42 +263,6 @@ public class FloatHelper {
             }
             mIsShowing = false;
         }
-
-        public void onMove(View view, float dx, float dy) {
-            if (!mMinimized) {
-                mLayoutParams.x += dx;
-                mLayoutParams.y += dy;
-                mWindowManager.updateViewLayout(this, mLayoutParams);
-            }
-        }
-
-        public void onMinimize() {
-            if (!mMinimized) {
-                mMinimized = true;
-                mLastFloatX = mLayoutParams.x;
-                mLastFloatY = mLayoutParams.y;
-                mLayoutParams.x = mLayoutParams.y = 0;
-                mLayoutParams.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
-                mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                        | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE //使应用页面事件不被拦截（主要是键盘输入）
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-                mWindowManager.updateViewLayout(this, mLayoutParams);
-            }
-        }
-
-        public void onExpand() {
-            if (mMinimized) {
-                mLayoutParams.gravity = Gravity.NO_GRAVITY;
-                mLayoutParams.x = mLastFloatX;
-                mLayoutParams.y = mLastFloatY;
-                mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-                mWindowManager.updateViewLayout(this, mLayoutParams);
-                mMinimized = false;
-            }
-        }
     }
 
 }
