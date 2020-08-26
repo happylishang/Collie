@@ -74,7 +74,13 @@ public class BatteryStatsTracker implements ITracker {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        computeBatteryInfo(application);
+                        if (mListeners.size() > 0) {
+                            BatteryInfo batteryInfo = computeBatteryInfo(application);
+                            for (IBatteryListener listener : mListeners) {
+                                listener.onBatteryCost(batteryInfo);
+                            }
+                        }
+
                     }
                 });
             }
@@ -120,7 +126,6 @@ public class BatteryStatsTracker implements ITracker {
             batteryInfo.display = display;
             batteryInfo.total = scale;
             Log.v("Battery", "total " + batteryInfo.total + " 用时间 " + batteryInfo.duration / 1000 + " 耗电  " + batteryInfo.cost);
-
         } catch (Exception e) {
 
         }
