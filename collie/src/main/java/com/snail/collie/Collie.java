@@ -62,9 +62,9 @@ public class Collie {
             }
 
             @Override
-            public void onANRAppear(Activity activity, long currentCostMils) {
+            public void onANRAppear(Activity activity) {
                 for (CollieListener collieListener : mCollieListeners) {
-                    collieListener.onANRAppear(activity, currentCostMils);
+                    collieListener.onANRAppear(activity);
                 }
             }
         };

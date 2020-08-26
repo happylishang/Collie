@@ -16,6 +16,7 @@ import com.snail.collie.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     private HashMap<Activity, CollectItem> mActivityCollectItemHashMap = new HashMap<>();
     private long mStartTime;
     private static volatile FpsTracker sInstance = null;
+    private ANRMonitorRunnable mMonitorRunnable;
 
     public void addTrackerListener(ITrackFpsListener listener) {
         mITrackListeners.add(listener);
@@ -106,6 +108,16 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     public void dispatchStart() {
         super.dispatchStart();
         mStartTime = SystemClock.uptimeMillis();
+        mHandler.postDelayed(mMonitorRunnable = new ANRMonitorRunnable(new WeakReference<>(ActivityStack.getInstance().getTopActivity())) {
+            @Override
+            public void run() {
+                if (this.getActivityRef() != null && this.getActivityRef().get() != null) {
+                    for (ITrackFpsListener item : mITrackListeners) {
+                        item.onANRAppear(this.getActivityRef().get());
+                    }
+                }
+            }
+        }, 5000);
     }
 
 
@@ -116,6 +128,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     @Override
     public void dispatchEnd() {
         super.dispatchEnd();
+        mHandler.removeCallbacks(mMonitorRunnable);
         if (mStartTime > 0) {
             long cost = SystemClock.uptimeMillis() - mStartTime;
             collectInfoAndDispatch(ActivityStack.getInstance().getTopActivity(), cost, mInDoFrame);
@@ -154,9 +167,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
                         if (collectItem.sumFrame > 10) {
                             long averageFps = Math.min(60, collectItem.sumCost > 0 ? collectItem.sumFrame * 1000 / collectItem.sumCost : 60);
                             item.onFpsTrack(activity, cost, cost <= 16 ? 0 : Math.max(1, cost / 16 - 1), inDoFrame, averageFps);
-                            if (cost > 5000) {
-                                item.onANRAppear(activity, cost);
-                            }
                         }
                     }
                     //   不过度累积

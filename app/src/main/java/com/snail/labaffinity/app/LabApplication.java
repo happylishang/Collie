@@ -82,8 +82,8 @@ public class LabApplication extends Application {
             }
 
             @Override
-            public void onANRAppear(Activity activity, long currentCostMils) {
-                Log.v("Collie", "Activity " + activity + " ANR  " + currentCostMils);
+            public void onANRAppear(Activity activity) {
+                Log.v("Collie", "Activity " + activity + " ANR  " );
 
             }
         });
