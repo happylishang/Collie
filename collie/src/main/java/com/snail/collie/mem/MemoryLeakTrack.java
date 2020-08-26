@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Process;
 import android.os.SystemClock;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -92,9 +91,9 @@ public class MemoryLeakTrack implements ITracker {
                                 hashMap.put(name, value + 1);
                             }
                         }
-                        if (mMemoryLeakListeners.size() > 0) {
+                        if (mMemoryListeners.size() > 0) {
                             for (Map.Entry<String, Integer> entry : hashMap.entrySet()) {
-                                for (ITrackMemoryListener listener : mMemoryLeakListeners) {
+                                for (ITrackMemoryListener listener : mMemoryListeners) {
                                     listener.onLeakActivity(entry.getKey(), entry.getValue());
                                 }
                             }
@@ -118,9 +117,9 @@ public class MemoryLeakTrack implements ITracker {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mMemoryLeakListeners.size() > 0) {
+                if (mMemoryListeners.size() > 0 && !ActivityStack.getInstance().isInBackGround()) {
                     TrackMemoryInfo trackMemoryInfo = collectMemoryInfo(application);
-                    for (ITrackMemoryListener listener : mMemoryLeakListeners) {
+                    for (ITrackMemoryListener listener : mMemoryListeners) {
                         listener.onCurrentMemoryCost(trackMemoryInfo);
                     }
                 }
@@ -134,14 +133,14 @@ public class MemoryLeakTrack implements ITracker {
 
     }
 
-    private Set<ITrackMemoryListener> mMemoryLeakListeners = new HashSet<>();
+    private Set<ITrackMemoryListener> mMemoryListeners = new HashSet<>();
 
     public void addOnMemoryLeakListener(ITrackMemoryListener leakListener) {
-        mMemoryLeakListeners.add(leakListener);
+        mMemoryListeners.add(leakListener);
     }
 
     public void removeOnMemoryLeakListener(ITrackMemoryListener leakListener) {
-        mMemoryLeakListeners.remove(leakListener);
+        mMemoryListeners.remove(leakListener);
     }
 
     public interface ITrackMemoryListener {
