@@ -57,6 +57,13 @@ public class Collie {
 
                 });
             }
+
+            @Override
+            public void onANRAppear(Activity activity, long currentCostMils) {
+                for (CollieListener collieListener : mCollieListeners) {
+                    collieListener.onANRAppear(activity, currentCostMils);
+                }
+            }
         };
 
         mTrackTrafficStatsListener = new ITrackTrafficStatsListener() {

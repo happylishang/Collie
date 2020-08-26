@@ -73,6 +73,12 @@ public class LabApplication extends Application {
                 if (currentDropFrame >= 2)
                     Log.v("Collie", "Activity " + activity + " 掉帧 " + currentDropFrame + " 是否因为Choro 绘制掉帧 " + isInFrameDraw + " 1s 平均帧率" + averageFps);
             }
+
+            @Override
+            public void onANRAppear(Activity activity, long currentCostMils) {
+                Log.v("Collie", "Activity " + activity + " ANR  " + currentCostMils);
+
+            }
         });
     }
 
