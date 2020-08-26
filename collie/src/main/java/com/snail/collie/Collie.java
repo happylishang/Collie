@@ -8,6 +8,7 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snail.collie.battery.BatteryInfo;
 import com.snail.collie.battery.BatteryStatsTracker;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
@@ -32,6 +33,8 @@ public class Collie {
     private ITrackTrafficStatsListener mTrackTrafficStatsListener;
     private MemoryLeakTrack.ITrackMemoryListener mITrackMemoryLeakListener;
     private LauncherTracker.ILaunchTrackListener mILaunchTrackListener;
+    private BatteryStatsTracker.IBatteryListener mIBatteryListener;
+
     private List<CollieListener> mCollieListeners = new ArrayList<>();
     private HashSet<Application.ActivityLifecycleCallbacks> mActivityLifecycleCallbacks = new HashSet<>();
 
@@ -112,6 +115,15 @@ public class Collie {
 //                }
                 for (CollieListener collieListener : mCollieListeners) {
                     collieListener.onActivityLaunchCost(activity, duration);
+                }
+            }
+        };
+
+        mIBatteryListener = new BatteryStatsTracker.IBatteryListener() {
+            @Override
+            public void onBatteryCost(BatteryInfo batteryInfo) {
+                for (CollieListener collieListener : mCollieListeners) {
+                    collieListener.onBatteryCost(batteryInfo);
                 }
             }
         };
@@ -200,6 +212,7 @@ public class Collie {
 
         if (config.userTrafficTrack) {
             TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
+            TrafficStatsTracker.getInstance().startTrack(application);
         }
         if (config.userMemTrack) {
             MemoryLeakTrack.getInstance().startTrack(application);
@@ -213,10 +226,15 @@ public class Collie {
         }
 
         if (config.userBatteryTrack) {
+            BatteryStatsTracker.getInstance().addBatteryListener(mIBatteryListener);
             BatteryStatsTracker.getInstance().startTrack(application);
         }
-        LauncherTracker.getInstance().addLaunchTrackListener(mILaunchTrackListener);
-        LauncherTracker.getInstance().startTrack(application);
+
+        if (config.userStartUpTrack) {
+            LauncherTracker.getInstance().addLaunchTrackListener(mILaunchTrackListener);
+            LauncherTracker.getInstance().startTrack(application);
+        }
+
     }
 
     public void registerCollieListener(CollieListener listener) {

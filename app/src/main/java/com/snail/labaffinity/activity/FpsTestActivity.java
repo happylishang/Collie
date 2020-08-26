@@ -46,7 +46,7 @@ public class FpsTestActivity extends BaseActivity {
             public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 //                LogUtils.v("位置 " + position);
                 if (position > 10)
-                    SystemClock.sleep(50);
+                    SystemClock.sleep(500);
                 ((TextView) holder.itemView).setHeight(500);
                 ((TextView) holder.itemView).setText("位置 " + position);
 

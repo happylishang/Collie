@@ -2,10 +2,13 @@ package com.snail.collie.battery;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -17,13 +20,17 @@ import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.collie.debug.DebugHelper;
+import com.snail.collie.startup.LauncherHelpProvider;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class BatteryStatsTracker implements ITracker {
     private static BatteryStatsTracker sInstance;
     private Handler mHandler;
     private String display;
+    private int mStartPercent;
 
     private BatteryStatsTracker() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
@@ -42,49 +49,40 @@ public class BatteryStatsTracker implements ITracker {
 
     private SimpleActivityLifecycleCallbacks mSimpleActivityLifecycleCallbacks = new SimpleActivityLifecycleCallbacks() {
 
-        @Override
-        public void onActivityPaused(final @NonNull Activity activity) {
-            super.onActivityPaused(activity);
-            BatteryInfo batteryInfo = mBatteryInfoHashMap.get(activity);
-            if (batteryInfo == null) {
-                batteryInfo = new BatteryInfo();
-                mBatteryInfoHashMap.put(activity, batteryInfo);
-            }
-            if (ActivityStack.getInstance().isInBackGround()) {
-                final BatteryInfo batteryInfoBack = batteryInfo;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        computeBatteryInfo(activity, batteryInfoBack);
-                    }
-                });
-            }
-
-        }
 
         @Override
         public void onActivityStarted(@NonNull Activity activity) {
             super.onActivityStarted(activity);
-            lastTimeStamp = SystemClock.uptimeMillis();
-            lastPercent = mBatteryLevelReceiver.getCurrentBatteryLevel();
+            final Application application = activity.getApplication();
+            if (mStartPercent == 0 && ActivityStack.getInstance().getTopActivity() == activity) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+                        android.content.Intent batteryStatus = application.registerReceiver(null, filter);
+                        mStartPercent = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                    }
+                });
+            }
         }
 
         @Override
-        public void onActivityDestroyed(@NonNull Activity activity) {
-            super.onActivityDestroyed(activity);
-            mBatteryInfoHashMap.remove(activity);
+        public void onActivityStopped(@NonNull final Activity activity) {
+            super.onActivityStopped(activity);
+            final Application application = activity.getApplication();
+            if (ActivityStack.getInstance().isInBackGround()) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        computeBatteryInfo(application);
+                    }
+                });
+            }
         }
     };
 
-    private long lastTimeStamp;
-    private float lastPercent;
-
     @Override
     public void destroy(Application application) {
-        if (mBatteryLevelReceiver != null) {
-            application.unregisterReceiver(mBatteryLevelReceiver);
-            mBatteryLevelReceiver = null;
-        }
         Collie.getInstance().removeActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
     }
 
@@ -93,11 +91,8 @@ public class BatteryStatsTracker implements ITracker {
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        application.registerReceiver(mBatteryLevelReceiver = new BatteryLevelReceiver(), intentFilter);
     }
 
-    private BatteryLevelReceiver mBatteryLevelReceiver;
-    private HashMap<Activity, BatteryInfo> mBatteryInfoHashMap = new HashMap<>();
 
     @Override
     public void pauseTrack(Application application) {
@@ -105,22 +100,53 @@ public class BatteryStatsTracker implements ITracker {
     }
 
     //    似乎并没有必要按照Activity统计耗点，每个界面很难超过1%
-    private BatteryInfo computeBatteryInfo(Activity activity, @NonNull BatteryInfo info) {
-//        info.activityName = activity.getClass().getSimpleName();
+    private BatteryInfo computeBatteryInfo(Application application) {
 
         if (TextUtils.isEmpty(display)) {
-            display = "" + activity.getResources().getDisplayMetrics().widthPixels + "*" + activity.getResources().getDisplayMetrics().heightPixels;
+            display = "" + application.getResources().getDisplayMetrics().widthPixels + "*" + application.getResources().getDisplayMetrics().heightPixels;
         }
         BatteryInfo batteryInfo = new BatteryInfo();
-        batteryInfo.charging = mBatteryLevelReceiver.isCharging();
-        batteryInfo.cost = mBatteryLevelReceiver.isCharging() || lastPercent < 1 ? 0 : batteryInfo.cost + (lastPercent - mBatteryLevelReceiver.getCurrentBatteryLevel());
-        batteryInfo.duration += SystemClock.uptimeMillis() - lastTimeStamp;
-        batteryInfo.screenBrightness = activity.getWindow().getAttributes().screenBrightness;
-        batteryInfo.display = display;
-        batteryInfo.total = mBatteryLevelReceiver.getTotalBatteryPercent();
-        batteryInfo.voltage = mBatteryLevelReceiver.getVoltage();
-        Log.v("Battery",  "total " + batteryInfo.total + "用时间 " + batteryInfo.duration/1000 + "耗电  " + batteryInfo.cost);
+        try {
+            IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            android.content.Intent batteryStatus = application.registerReceiver(null, filter);
+            int status = batteryStatus.getIntExtra("status", 0);
+            boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                    status == BatteryManager.BATTERY_STATUS_FULL;
+            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            batteryInfo.charging = isCharging;
+            batteryInfo.cost = isCharging ? 0 : mStartPercent - batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            batteryInfo.duration += (SystemClock.uptimeMillis() - LauncherHelpProvider.sStartUpTimeStamp) / 1000;
+            batteryInfo.screenBrightness = getSystemScreenBrightnessValue(application);
+            batteryInfo.display = display;
+            batteryInfo.total = scale;
+            Log.v("Battery", "total " + batteryInfo.total + " 用时间 " + batteryInfo.duration / 1000 + " 耗电  " + batteryInfo.cost);
+
+        } catch (Exception e) {
+
+        }
+
         return batteryInfo;
     }
 
+    public int getSystemScreenBrightnessValue(Application application) {
+        ContentResolver contentResolver = application.getContentResolver();
+        int defVal = 125;
+        return Settings.System.getInt(contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS, defVal);
+    }
+
+    private List<IBatteryListener> mListeners = new ArrayList<>();
+
+    public void addBatteryListener(IBatteryListener listener) {
+        mListeners.add(listener);
+    }
+
+    public void removeBatteryListener(IBatteryListener listener) {
+        mListeners.remove(listener);
+    }
+
+    public interface IBatteryListener {
+        void onBatteryCost(BatteryInfo batteryInfo);
+
+    }
 }

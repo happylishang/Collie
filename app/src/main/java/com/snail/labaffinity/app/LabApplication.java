@@ -12,6 +12,7 @@ import com.netease.nis.bugrpt.CrashHandler;
 import com.snail.collie.Collie;
 import com.snail.collie.CollieListener;
 import com.snail.collie.Config;
+import com.snail.collie.battery.BatteryInfo;
 import com.snail.collie.mem.TrackMemoryInfo;
 
 import java.io.BufferedReader;
@@ -37,6 +38,12 @@ public class LabApplication extends Application {
         Router.initActivityRouter(getApplicationContext());
         FirebaseAnalytics.getInstance(this);
         Collie.getInstance().init(this, new Config(true, true, true, true, true, true), new CollieListener() {
+
+            @Override
+            public void onBatteryCost(BatteryInfo batteryInfo) {
+                Log.v("Collie",  " 电量流量消耗 " +batteryInfo.cost);
+
+            }
 
             @Override
             public void onTrafficStats(String activityName, long value) {

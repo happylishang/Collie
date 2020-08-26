@@ -12,6 +12,7 @@ public class BatteryLevelReceiver extends BroadcastReceiver {
     private int scale;
     private boolean isCharging;
     private int voltage;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         //当前剩余电量
@@ -33,6 +34,7 @@ public class BatteryLevelReceiver extends BroadcastReceiver {
     public int getTotalBatteryPercent() {
         return scale;
     }
+
     public int getVoltage() {
         return voltage;
     }

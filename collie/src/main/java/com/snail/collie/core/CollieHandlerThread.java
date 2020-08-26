@@ -1,5 +1,6 @@
 package com.snail.collie.core;
 
+import android.os.Handler;
 import android.os.HandlerThread;
 
 public class CollieHandlerThread {
@@ -11,10 +12,16 @@ public class CollieHandlerThread {
     }
 
     private HandlerThread mHandlerThread;
+    private Handler mHandler;
 
     private CollieHandlerThread() {
         mHandlerThread = new HandlerThread("track_performance");
         mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+    }
+
+    public Handler getHandler() {
+        return mHandler;
     }
 
     public static CollieHandlerThread getInstance() {

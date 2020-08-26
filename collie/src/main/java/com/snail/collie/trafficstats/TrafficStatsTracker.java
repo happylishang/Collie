@@ -52,7 +52,6 @@ public class TrafficStatsTracker implements ITracker {
     }
 
     private TrafficStatsTracker() {
-        Collie.getInstance().addActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
     }
 
     public static TrafficStatsTracker getInstance() {
@@ -106,7 +105,7 @@ public class TrafficStatsTracker implements ITracker {
 
     @Override
     public void startTrack(Application application) {
-
+        Collie.getInstance().addActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
     }
 
     @Override
