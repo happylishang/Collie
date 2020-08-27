@@ -58,9 +58,10 @@ public class LabApplication extends Application {
             @Override
             public void onActivityLaunchCost(Activity activity, long duration) {
                 Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
-                if (duration > 800) {
-                    Toast.makeText(activity, "耗时 " + duration + "ms", Toast.LENGTH_SHORT).show();
-                }
+//                if (duration > 800) {
+//                toast 可能导致短时间内存泄露
+//                    Toast.makeText(activity, "耗时 " + duration + "ms", Toast.LENGTH_SHORT).show();
+//                }
             }
 
             @Override

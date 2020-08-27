@@ -101,7 +101,7 @@ public class MemoryLeakTrack implements ITracker {
                     } catch (Exception ignored) {
                     }
                 }
-            }, 5000);
+            }, 10000);
         }
     };
 

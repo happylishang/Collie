@@ -10,6 +10,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -23,5 +24,8 @@ public class LeakTestActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sActivity .add(this);
+        TextView textView = new TextView(this);
+        textView.setText("LeakTestActivity");
+        setContentView(textView);
     }
 }

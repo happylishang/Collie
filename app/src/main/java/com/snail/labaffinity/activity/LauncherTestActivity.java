@@ -23,6 +23,9 @@ public class LauncherTestActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SystemClock.sleep(1000);
+        TextView textView = new TextView(this);
+        textView.setText("LauncherTestActivity");
+        setContentView(textView);
     }
 
 
