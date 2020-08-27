@@ -44,7 +44,7 @@ public class LauncherTracker implements ITracker {
         return sInstance;
     }
 
-    private volatile int launcherFlag;
+    private int launcherFlag;
     private static int createFlag = 1;
     private static int resumeFlag = 1 << 1;
     private static int startFlag = createFlag | resumeFlag;
@@ -66,7 +66,7 @@ public class LauncherTracker implements ITracker {
                 public void run() {
                     if (activity.isFinishing()) {
                         if ((launcherFlag ^ createFlag) == 0) {
-                            collectInfo(activity);
+                            collectInfo(activity, true);
                             launcherFlag = 0;
                         }
                     }
@@ -80,11 +80,6 @@ public class LauncherTracker implements ITracker {
             mActivityLauncherTimeStamp = SystemClock.uptimeMillis();
             // 闪屏可能存在不调用resume的场景 onCreate中国直接finish
             launcherFlag = 0;
-        }
-
-        @Override
-        public void onActivityDestroyed(@NonNull Activity activity) {
-            super.onActivityDestroyed(activity);
         }
 
         //  准确来说 是在Activity的onWindowFocusChanged才可见
@@ -104,7 +99,7 @@ public class LauncherTracker implements ITracker {
                 public void onWindowFocusChanged(boolean b) {
                     if (b && (launcherFlag ^ startFlag) == 0) {
                         activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
-                        collectInfo(activity);
+                        collectInfo(activity, false);
                     }
                 }
             });
@@ -112,7 +107,7 @@ public class LauncherTracker implements ITracker {
 
     };
 
-    private void collectInfo(final Activity activity) {
+    private void collectInfo(final Activity activity, final boolean finishNow) {
         final boolean isColdStarUp = ActivityStack.getInstance().getBottomActivity() == activity;
         final long coldLauncherTime = SystemClock.uptimeMillis() - LauncherHelpProvider.sStartUpTimeStamp;
         final long activityLauncherTime = SystemClock.uptimeMillis() - mActivityLauncherTimeStamp;
@@ -125,7 +120,7 @@ public class LauncherTracker implements ITracker {
                     }
                 }
                 for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
-                    launcherTrackListener.onActivityLaunchCost(activity, activityLauncherTime);
+                    launcherTrackListener.onActivityLaunchCost(activity, activityLauncherTime, finishNow);
                 }
 
             }
@@ -161,6 +156,6 @@ public class LauncherTracker implements ITracker {
 
         void onAppColdLaunchCost(long duration);
 
-        void onActivityLaunchCost(Activity activity, long duration);
+        void onActivityLaunchCost(Activity activity, long duration, boolean finishNow);
     }
 }

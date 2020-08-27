@@ -108,13 +108,13 @@ public class Collie {
             }
 
             @Override
-            public void onActivityLaunchCost(Activity activity, long duration) {
+            public void onActivityLaunchCost(Activity activity, long duration,boolean finishNow) {
 ////                Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
 //                if(duration>800){
 //                    Toast.makeText(activity,"耗时 "+duration+"ms",Toast.LENGTH_SHORT).show();
 //                }
                 for (CollieListener collieListener : mCollieListeners) {
-                    collieListener.onActivityLaunchCost(activity, duration);
+                    collieListener.onActivityLaunchCost(activity, duration,finishNow);
                 }
             }
         };

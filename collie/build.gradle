@@ -77,7 +77,7 @@ bintray {
 }
 
 
-version = '1.02'
+version = '1.022'
 group = 'com.snail'
 
 task sourcesJar(type: Jar) {
