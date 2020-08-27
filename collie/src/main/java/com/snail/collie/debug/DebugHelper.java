@@ -65,7 +65,7 @@ public class DebugHelper implements ITracker {
             mDebugCollieView = new FloatingFpsView(context);
             mFloatHelper = new FloatHelper(context);
             mFloatHelper.setAlignSide(false)
-                    .setInitPosition(context.getResources().getDisplayMetrics().widthPixels - MeasureUtil.getMeasuredWidth(mDebugCollieView, 0), 80);
+                    .setInitPosition(context.getResources().getDisplayMetrics().widthPixels - MeasureUtil.getMeasuredWidth(mDebugCollieView, 0), 200);
 
         }
         mHandler.post(new Runnable() {
