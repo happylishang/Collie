@@ -29,7 +29,16 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     private HashMap<Activity, CollectItem> mActivityCollectItemHashMap = new HashMap<>();
     private long mStartTime;
     private static volatile FpsTracker sInstance = null;
-    private ANRMonitorRunnable mMonitorRunnable;
+    private ANRMonitorRunnable mMonitorRunnable = new ANRMonitorRunnable(new WeakReference<>(ActivityStack.getInstance().getTopActivity())) {
+        @Override
+        public void run() {
+            if (this.getActivityRef() != null && this.getActivityRef().get() != null) {
+                for (ITrackFpsListener item : mITrackListeners) {
+                    item.onANRAppear(this.getActivityRef().get());
+                }
+            }
+        }
+    };
 
     public void addTrackerListener(ITrackFpsListener listener) {
         mITrackListeners.add(listener);
@@ -108,16 +117,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     public void dispatchStart() {
         super.dispatchStart();
         mStartTime = SystemClock.uptimeMillis();
-        mHandler.postDelayed(mMonitorRunnable = new ANRMonitorRunnable(new WeakReference<>(ActivityStack.getInstance().getTopActivity())) {
-            @Override
-            public void run() {
-                if (this.getActivityRef() != null && this.getActivityRef().get() != null) {
-                    for (ITrackFpsListener item : mITrackListeners) {
-                        item.onANRAppear(this.getActivityRef().get());
-                    }
-                }
-            }
-        }, 5000);
+        mHandler.postDelayed(mMonitorRunnable, 5000);
     }
 
 
@@ -128,7 +128,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     @Override
     public void dispatchEnd() {
         super.dispatchEnd();
-        mHandler.removeCallbacks(mMonitorRunnable);
         if (mStartTime > 0) {
             long cost = SystemClock.uptimeMillis() - mStartTime;
             collectInfoAndDispatch(ActivityStack.getInstance().getTopActivity(), cost, mInDoFrame);
@@ -265,6 +264,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     @Override
     public void pauseTrack(Application application) {
         LooperMonitor.unregister(this);
+        mHandler.removeCallbacksAndMessages(null);
         mITrackListeners.clear();
         mActivityCollectItemHashMap.clear();
         mStartTime = 0;
