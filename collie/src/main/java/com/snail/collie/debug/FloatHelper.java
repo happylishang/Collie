@@ -9,7 +9,6 @@ import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +42,7 @@ public class FloatHelper {
     private boolean mNeedReload = false;
     private boolean mAlignSide;
     private boolean isMove = false;
+    private AlertDialog mPermissionDialog;
 
     public FloatHelper setAlignSide(boolean alignSide) {
         this.mAlignSide = alignSide;
@@ -99,26 +99,30 @@ public class FloatHelper {
     }
 
     private void showTips(final Activity activity) {
-        AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setMessage("您需要打开悬浮窗权限")
-                //可以直接设置这三种button
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+        if (mPermissionDialog == null) {
+            mPermissionDialog = new AlertDialog.Builder(activity)
+                    .setMessage("您需要打开悬浮窗权限")
+                    //可以直接设置这三种button
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                        requestOverlayPermission(activity, FloatHelper.PERMISSIONS_REQUEST_OVERLAY);
-                        dialog.dismiss();
+                            requestOverlayPermission(activity, FloatHelper.PERMISSIONS_REQUEST_OVERLAY);
+                            dialog.dismiss();
 
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .create();
-        dialog.show();
+                        }
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create();
+        }
+        if(!mPermissionDialog.isShowing()){
+            mPermissionDialog.show();
+        }
     }
 
     /**

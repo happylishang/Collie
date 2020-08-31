@@ -68,6 +68,7 @@ public class LauncherTracker implements ITracker {
                         if ((launcherFlag ^ createFlag) == 0) {
                             collectInfo(activity, true);
                             launcherFlag = 0;
+                            mActivityLauncherTimeStamp = SystemClock.uptimeMillis();
                         }
                     }
                 }
