@@ -41,7 +41,9 @@
         <activity android:name=".activity.TrafficTestActivity" />
         <activity android:name=".activity.LeakTestActivity" />
         <activity android:name=".activity.LauncherTestActivity" />
-        <activity android:name=".activity.SplashActivity">
+        <activity
+            android:name=".activity.SplashActivity"
+            android:theme="@style/AppThemeBG">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -49,8 +51,6 @@
             </intent-filter>
 
         </activity>
-
-
 
 
         <service android:name=".service.BackGroundService" />

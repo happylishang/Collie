@@ -5,8 +5,16 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+
         <item name="colorAccent">@color/colorAccent</item>
+
     </style>
+
+    <style name="AppThemeBG" parent="AppTheme">
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@mipmap/ic_launcher</item>
+    </style>
+
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

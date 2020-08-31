@@ -20,9 +20,9 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TextView textView = new TextView(this);
-        textView.setText("SplashActivity");
-        setContentView(textView);
+
+
+        SystemClock.sleep(3000);
         new Handler().post(new Runnable() {
             @Override
             public void run() {
