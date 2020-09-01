@@ -88,27 +88,29 @@ public class LauncherTracker implements ITracker {
         @Override
         public void onActivityResumed(@NonNull final Activity activity) {
             super.onActivityResumed(activity);
-            launcherFlag |= resumeFlag;
-            activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+            if (launcherFlag != 0 && (launcherFlag & resumeFlag) == 0) {
+                launcherFlag |= resumeFlag;
+                activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
 
-                /**
-                 * Called when the current {@link Window } of the activity gains or loses* focus.  This is the best indicator of whether this activity is visible
-                 * to the user.  The default implementation clears the key tracking
-                 * state, so should always be called.
-                 */
-                @Override
-                public void onWindowFocusChanged(boolean b) {
-                    if (b && (launcherFlag ^ startFlag) == 0) {
-                        collectInfo(activity, false);
+                    /**
+                     * Called when the current {@link Window } of the activity gains or loses* focus.  This is the best indicator of whether this activity is visible
+                     * to the user.  The default implementation clears the key tracking
+                     * state, so should always be called.
+                     */
+                    @Override
+                    public void onWindowFocusChanged(boolean b) {
+                        // 可能resume立刻finish
+                        collectInfo(activity, !b);
+                        activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
                     }
-                    activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
-                }
-            });
+                });
+            }
         }
     };
 
     private void collectInfo(final Activity activity, final boolean finishNow) {
-        final boolean isColdStarUp = ActivityStack.getInstance().getBottomActivity() == activity;
+        final boolean isColdStarUp = !ActivityStack.getInstance().isWarmLaunch()
+                && ActivityStack.getInstance().getBottomActivity() == activity;
         final long coldLauncherTime = SystemClock.uptimeMillis() - LauncherHelpProvider.sStartUpTimeStamp;
         final long activityLauncherTime = SystemClock.uptimeMillis() - mActivityLauncherTimeStamp;
         mHandler.post(new Runnable() {

@@ -6,4 +6,5 @@ public class TrackMemoryInfo {
     public AppMemory appMemory;
     public SystemMemory systemMemoryInfo;
     public String display;
+    public int activityCount;
 }
