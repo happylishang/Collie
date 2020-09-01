@@ -22,7 +22,7 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
 
-        SystemClock.sleep(3000);
+//        SystemClock.sleep(3000);
         new Handler().post(new Runnable() {
             @Override
             public void run() {
@@ -30,7 +30,7 @@ public class SplashActivity extends BaseActivity {
 
             }
         });
-        finish();
+
         LogUtils.v("onCreate " + SystemClock.uptimeMillis());
     }
 
@@ -38,6 +38,7 @@ public class SplashActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         LogUtils.v("onStop " + SystemClock.uptimeMillis());
+        finish();
     }
 
     @Override

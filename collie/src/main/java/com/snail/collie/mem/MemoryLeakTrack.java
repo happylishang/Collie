@@ -6,7 +6,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Debug;
 import android.os.Handler;
-import android.os.Process;
 import android.os.SystemClock;
 import android.text.TextUtils;
 
@@ -16,6 +15,7 @@ import com.snail.collie.Collie;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
+import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 
 import java.io.BufferedReader;
@@ -184,34 +184,10 @@ public class MemoryLeakTrack implements ITracker {
         trackMemoryInfo.systemMemoryInfo = systemMemory;
         trackMemoryInfo.appMemory = appMemory;
 
-        trackMemoryInfo.procName = getProcessName(Process.myPid());
+        trackMemoryInfo.procName = ProcessUtil.getProcessName();
         trackMemoryInfo.display = display;
         trackMemoryInfo.activityCount = ActivityStack.getInstance().getSize();
         return trackMemoryInfo;
-    }
-
-
-    private static String getProcessName(int pid) {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new FileReader("/proc/" + pid + "/cmdline"));
-            String processName = reader.readLine();
-            if (!TextUtils.isEmpty(processName)) {
-                processName = processName.trim();
-            }
-            return processName;
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException exception) {
-                exception.printStackTrace();
-            }
-        }
-        return null;
     }
 
 }

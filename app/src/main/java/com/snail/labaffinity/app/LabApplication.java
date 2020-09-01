@@ -35,7 +35,7 @@ public class LabApplication extends Application {
         CrashHandler.init(getApplicationContext());
 //        CrashReport.initCrashReport(getApplicationContext(), "e7f834a1e0", BuildConfig.DEBUG);
         sApplication = this;
-        SystemClock.sleep(3000);
+//        SystemClock.sleep(3000);
         Router.initBrowserRouter(this);
         Router.initActivityRouter(getApplicationContext());
         FirebaseAnalytics.getInstance(this);
@@ -53,8 +53,8 @@ public class LabApplication extends Application {
             }
 
             @Override
-            public void onAppColdLaunchCost(long duration) {
-                Log.v("Collie", "启动耗时 " + duration);
+            public void onAppColdLaunchCost(long duration ,String processName) {
+                Log.v("Collie", "启动耗时 " + duration +" processName "+processName);
             }
 
             @Override

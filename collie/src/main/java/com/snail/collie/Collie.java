@@ -100,10 +100,10 @@ public class Collie {
         };
         mILaunchTrackListener = new LauncherTracker.ILaunchTrackListener() {
             @Override
-            public void onAppColdLaunchCost(long duration) {
+            public void onAppColdLaunchCost(long duration ,String processName) {
 //                Log.v("Collie", "cold " + duration);
                 for (CollieListener collieListener : mCollieListeners) {
-                    collieListener.onAppColdLaunchCost(duration);
+                    collieListener.onAppColdLaunchCost(duration,processName);
                 }
             }
 

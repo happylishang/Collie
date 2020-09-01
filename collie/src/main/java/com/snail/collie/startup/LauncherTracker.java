@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewTreeObserver;
 import android.view.Window;
@@ -17,9 +18,13 @@ import com.snail.collie.Collie;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
+import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.collie.debug.DebugHelper;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -118,7 +123,7 @@ public class LauncherTracker implements ITracker {
             public void run() {
                 if (isColdStarUp) {
                     for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
-                        launcherTrackListener.onAppColdLaunchCost(coldLauncherTime);
+                        launcherTrackListener.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName());
                     }
                 }
                 for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
@@ -156,8 +161,9 @@ public class LauncherTracker implements ITracker {
 
     public interface ILaunchTrackListener {
 
-        void onAppColdLaunchCost(long duration);
+        void onAppColdLaunchCost(long duration,String procName);
 
         void onActivityLaunchCost(Activity activity, long duration, boolean finishNow);
     }
+
 }
