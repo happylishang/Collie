@@ -99,13 +99,12 @@ public class LauncherTracker implements ITracker {
                 @Override
                 public void onWindowFocusChanged(boolean b) {
                     if (b && (launcherFlag ^ startFlag) == 0) {
-                        activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
                         collectInfo(activity, false);
                     }
+                    activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
                 }
             });
         }
-
     };
 
     private void collectInfo(final Activity activity, final boolean finishNow) {
