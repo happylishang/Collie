@@ -99,30 +99,25 @@ public class FloatHelper {
     }
 
     private void showTips(final Activity activity) {
-        if (mPermissionDialog == null) {
-            mPermissionDialog = new AlertDialog.Builder(activity)
-                    .setMessage("您需要打开悬浮窗权限")
-                    //可以直接设置这三种button
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+      new AlertDialog.Builder(activity)
+                .setMessage("您需要打开悬浮窗权限")
+                //可以直接设置这三种button
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-                            requestOverlayPermission(activity, FloatHelper.PERMISSIONS_REQUEST_OVERLAY);
-                            dialog.dismiss();
+                        requestOverlayPermission(activity, FloatHelper.PERMISSIONS_REQUEST_OVERLAY);
+                        dialog.dismiss();
 
-                        }
-                    })
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .create();
-        }
-        if(!mPermissionDialog.isShowing()){
-            mPermissionDialog.show();
-        }
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create().show();
     }
 
     /**
