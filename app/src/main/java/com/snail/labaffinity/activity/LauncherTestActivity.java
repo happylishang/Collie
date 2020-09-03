@@ -27,18 +27,28 @@ public class LauncherTestActivity extends BaseActivity {
         TextView textView = new TextView(this);
         textView.setText("LauncherTestActivity");
         setContentView(textView);
+//        finish();
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+//                SystemClock.sleep(3000);
+
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                SystemClock.sleep(2000);
+        SystemClock.sleep(3000);
+        finish();
 
-            }
-        });
+    }
+
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
     }
 
     @Override

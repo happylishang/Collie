@@ -16,7 +16,8 @@ public class MainActivity extends BaseActivity {
 
     private int count;
     ActivityMainBinding mResultProfileBinding;
-    long  start=SystemClock.uptimeMillis();
+    long start = SystemClock.uptimeMillis();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -29,20 +30,20 @@ public class MainActivity extends BaseActivity {
         mResultProfileBinding.contentMain1.activityStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mIntent=new Intent( MainActivity.this, LauncherTestActivity.class);
+                Intent mIntent = new Intent(MainActivity.this, LauncherTestActivity.class);
                 startActivity(mIntent);
             }
         });
 
         mResultProfileBinding.contentMain1.first.setOnClickListener(v -> {
-            Intent mIntent=new Intent( MainActivity.this, LeakTestActivity.class);
+            Intent mIntent = new Intent(MainActivity.this, LeakTestActivity.class);
             startActivity(mIntent);
 
         });
         mResultProfileBinding.contentMain1.second.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mIntent=new Intent( MainActivity.this, TrafficTestActivity.class);
+                Intent mIntent = new Intent(MainActivity.this, TrafficTestActivity.class);
                 startActivity(mIntent);
 
             }
@@ -52,10 +53,12 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                Intent mIntent=new Intent(MainActivity.this, FpsTestActivity.class);
+                Intent mIntent = new Intent(MainActivity.this, FpsTestActivity.class);
                 startActivity(mIntent);
             }
         });
+
+
     }
 
     @Override
@@ -67,5 +70,5 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-   }
+    }
 }
