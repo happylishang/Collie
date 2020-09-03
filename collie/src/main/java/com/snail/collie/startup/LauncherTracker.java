@@ -72,7 +72,7 @@ public class LauncherTracker implements ITracker {
                 public void run() {
                     if (activity.isFinishing()) {
                         if ((launcherFlag ^ createFlag) == 0) {
-                            collectInfo(activity, true);
+                            collectInfo(activity);
                             launcherFlag = 0;
                             mActivityLauncherTimeStamp = SystemClock.uptimeMillis();
                         }
@@ -97,11 +97,12 @@ public class LauncherTracker implements ITracker {
             if (launcherFlag != 0 && (launcherFlag & resumeFlag) == 0) {
                 launcherFlag |= resumeFlag;
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                    //  P之后有改动，第一帧可见提前了
+                    //  P之后有改动，第一帧可见提前了 可以认为onActivityResumed之后
                     mUIHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            collectInfo(activity, activity.isFinishing());
+                            //  执行完resume才可见，这里还没执行完
+                            collectInfo(activity);
                         }
                     });
                 } else {
@@ -115,7 +116,7 @@ public class LauncherTracker implements ITracker {
                         @Override
                         public void onWindowFocusChanged(boolean b) {
                             // 可能resume立刻finish
-                            collectInfo(activity, !b);
+                            collectInfo(activity);
                             activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
                         }
                     });
@@ -125,7 +126,7 @@ public class LauncherTracker implements ITracker {
         }
     };
 
-    private void collectInfo(final Activity activity, final boolean finishNow) {
+    private void collectInfo(final Activity activity ) {
         final boolean isColdStarUp = !ActivityStack.getInstance().isWarmLaunch()
                 && ActivityStack.getInstance().getBottomActivity() == activity;
         final long coldLauncherTime = SystemClock.uptimeMillis() - LauncherHelpProvider.sStartUpTimeStamp;
@@ -139,7 +140,7 @@ public class LauncherTracker implements ITracker {
                     }
                 }
                 for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
-                    launcherTrackListener.onActivityLaunchCost(activity, activityLauncherTime, finishNow);
+                    launcherTrackListener.onActivityLaunchCost(activity, activityLauncherTime, activity.isFinishing());
                 }
 
             }
