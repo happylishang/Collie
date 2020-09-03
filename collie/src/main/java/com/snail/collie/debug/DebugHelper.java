@@ -78,8 +78,9 @@ public class DebugHelper implements ITracker {
     }
 
     public void hide() {
-            if (mFloatHelper != null) {
-                mFloatHelper.destroy();
+        if (mFloatHelper != null) {
+            mFloatHelper.destroy();
+            mHandler.removeCallbacksAndMessages(null);
         }
     }
 

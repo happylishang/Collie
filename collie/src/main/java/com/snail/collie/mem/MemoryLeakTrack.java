@@ -62,6 +62,7 @@ public class MemoryLeakTrack implements ITracker {
             if (!ActivityStack.getInstance().isInBackGround()) {
                 return;
             }
+            mallocBigMem();
             Runtime.getRuntime().gc();
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -70,20 +71,14 @@ public class MemoryLeakTrack implements ITracker {
                         if (!ActivityStack.getInstance().isInBackGround()) {
                             return;
                         }
-                        try {
-                            //   申请个稍微大的对象，促进GC
-                            byte[] leakHelpBytes = new byte[4 * 1024 * 1024];
-                            for (int i = 0; i < leakHelpBytes.length; i += 1024) {
-                                leakHelpBytes[i] = 1;
-                            }
-                        } catch (Throwable ignored) {
-                        }
+                        //  分配大点内存促进GC
+                        mallocBigMem();
                         Runtime.getRuntime().gc();
                         SystemClock.sleep(100);
                         System.runFinalization();
                         HashMap<String, Integer> hashMap = new HashMap<>();
                         for (Map.Entry<Activity, String> activityStringEntry : mActivityStringWeakHashMap.entrySet()) {
-                            String name = activityStringEntry.getKey().getClass().getName();
+                            String name = activityStringEntry.getKey().getClass().getSimpleName();
                             Integer value = hashMap.get(name);
                             if (value == null) {
                                 hashMap.put(name, 1);
@@ -190,4 +185,10 @@ public class MemoryLeakTrack implements ITracker {
         return trackMemoryInfo;
     }
 
+    private void mallocBigMem() {
+        byte[] leakHelpBytes = new byte[4 * 1024 * 1024];
+        for (int i = 0; i < leakHelpBytes.length; i += 1024) {
+            leakHelpBytes[i] = 1;
+        }
+    }
 }

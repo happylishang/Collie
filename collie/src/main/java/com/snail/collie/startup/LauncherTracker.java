@@ -2,6 +2,7 @@ package com.snail.collie.startup;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -95,20 +96,31 @@ public class LauncherTracker implements ITracker {
             super.onActivityResumed(activity);
             if (launcherFlag != 0 && (launcherFlag & resumeFlag) == 0) {
                 launcherFlag |= resumeFlag;
-                activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                    //  P之后有改动，第一帧可见提前了
+                    mUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            collectInfo(activity, activity.isFinishing());
+                        }
+                    });
+                } else {
+                    activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
 
-                    /**
-                     * Called when the current {@link Window } of the activity gains or loses* focus.  This is the best indicator of whether this activity is visible
-                     * to the user.  The default implementation clears the key tracking
-                     * state, so should always be called.
-                     */
-                    @Override
-                    public void onWindowFocusChanged(boolean b) {
-                        // 可能resume立刻finish
-                        collectInfo(activity, !b);
-                        activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
-                    }
-                });
+                        /**
+                         * Called when the current {@link Window } of the activity gains or loses* focus.  This is the best indicator of whether this activity is visible
+                         * to the user.  The default implementation clears the key tracking
+                         * state, so should always be called.
+                         */
+                        @Override
+                        public void onWindowFocusChanged(boolean b) {
+                            // 可能resume立刻finish
+                            collectInfo(activity, !b);
+                            activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
+                        }
+                    });
+                }
+
             }
         }
     };
@@ -161,7 +173,7 @@ public class LauncherTracker implements ITracker {
 
     public interface ILaunchTrackListener {
 
-        void onAppColdLaunchCost(long duration,String procName);
+        void onAppColdLaunchCost(long duration, String procName);
 
         void onActivityLaunchCost(Activity activity, long duration, boolean finishNow);
     }
