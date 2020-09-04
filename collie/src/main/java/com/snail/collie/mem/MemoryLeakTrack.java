@@ -62,8 +62,14 @@ public class MemoryLeakTrack implements ITracker {
             if (!ActivityStack.getInstance().isInBackGround()) {
                 return;
             }
-            mallocBigMem();
-            Runtime.getRuntime().gc();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mallocBigMem();
+                    Runtime.getRuntime().gc();
+                }
+            }, 1000);
+
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
