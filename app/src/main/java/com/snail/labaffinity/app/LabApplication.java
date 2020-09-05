@@ -32,6 +32,18 @@ public class LabApplication extends Application {
     public void onCreate() {
 
         super.onCreate();
+
+        for (int i = 0; i < 200; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        SystemClock.sleep(1);
+
+                    }
+                }
+            }).start();
+        }
         CrashHandler.init(getApplicationContext());
 //        CrashReport.initCrashReport(getApplicationContext(), "e7f834a1e0", BuildConfig.DEBUG);
         sApplication = this;
@@ -48,8 +60,8 @@ public class LabApplication extends Application {
             }
 
             @Override
-            public void onTrafficStats(String activityName, long value) {
-                Log.v("Collie", "" + activityName + " 流量消耗 " + value * 1.0f / (1024 * 1024) + "M");
+            public void onTrafficStats(Activity activity, long value) {
+                Log.v("Collie", "" + activity.getClass().getSimpleName() + " 流量消耗 " + value * 1.0f / (1024 * 1024) + "M");
             }
 
             @Override
