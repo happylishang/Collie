@@ -1,7 +1,9 @@
 package com.snail.collie.trafficstats;
 
+import android.app.Activity;
+
 public interface ITrackTrafficStatsListener {
 
-    void onTrafficStats(String activityName, long value);
+    void onTrafficStats(Activity activity, long value);
 
 }

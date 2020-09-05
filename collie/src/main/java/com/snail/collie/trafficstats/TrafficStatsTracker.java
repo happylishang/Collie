@@ -89,11 +89,11 @@ public class TrafficStatsTracker implements ITracker {
     public void markActivityDestroy(Activity activity) {
         TrafficStatsItem item = mHashMap.get(activity);
         if (item != null) {
-            item.activity = null;
             for (ITrackTrafficStatsListener trafficStatsListener : mStatsListeners) {
-                trafficStatsListener.onTrafficStats(item.activityName, item.trafficCost);
+                trafficStatsListener.onTrafficStats(item.activity, item.trafficCost);
                 mHashMap.remove(activity);
             }
+            item.activity = null;
         }
     }
 

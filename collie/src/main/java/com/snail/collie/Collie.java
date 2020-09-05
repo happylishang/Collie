@@ -71,9 +71,9 @@ public class Collie {
 
         mTrackTrafficStatsListener = new ITrackTrafficStatsListener() {
             @Override
-            public void onTrafficStats(String activityName, long value) {
+            public void onTrafficStats(Activity activity, long value) {
                 for (CollieListener collieListener : mCollieListeners) {
-                    collieListener.onTrafficStats(activityName, value);
+                    collieListener.onTrafficStats(activity, value);
                 }
 //                Log.v("Collie", "" + activityName + " 流量消耗 " + value * 1.0f / (1024 * 1024) + "M");
             }
