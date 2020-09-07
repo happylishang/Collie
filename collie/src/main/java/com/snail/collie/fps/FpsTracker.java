@@ -2,6 +2,7 @@ package com.snail.collie.fps;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.Choreographer;
@@ -26,32 +27,23 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
 
     private HashSet<ITrackFpsListener> mITrackListeners = new HashSet<>();
     private Handler mHandler;
+    private Handler mANRHandler;
     private HashMap<Activity, CollectItem> mActivityCollectItemHashMap = new HashMap<>();
     private long mStartTime;
-    private static volatile FpsTracker sInstance = null;
-    private ANRMonitorRunnable mMonitorRunnable = new ANRMonitorRunnable(new WeakReference<>(ActivityStack.getInstance().getTopActivity())) {
-        @Override
-        public void run() {
-            if (this.getActivityRef() != null && this.getActivityRef().get() != null) {
-                for (ITrackFpsListener item : mITrackListeners) {
-                    item.onANRAppear(this.getActivityRef().get());
-                }
-            }
-        }
-    };
+    private static FpsTracker sInstance = null;
 
     public void addTrackerListener(ITrackFpsListener listener) {
         mITrackListeners.add(listener);
     }
 
     public void removeTrackerListener(ITrackFpsListener listener) {
-
         mITrackListeners.remove(listener);
     }
 
 
     private FpsTracker() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+        mANRHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
     }
 
     public static FpsTracker getInstance() {
@@ -117,9 +109,23 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     public void dispatchStart() {
         super.dispatchStart();
         mStartTime = SystemClock.uptimeMillis();
-        mHandler.postDelayed(mMonitorRunnable, 5000);
-    }
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                mANRHandler.postDelayed(new ANRMonitorRunnable(new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity())) {
+                    @Override
+                    public void run() {
+                        if (this.getActivityRef() != null && this.getActivityRef().get() != null) {
+                            for (ITrackFpsListener item : mITrackListeners) {
+                                item.onANRAppear(this.getActivityRef().get());
+                            }
+                        }
+                    }
+                }, 5000);
+            }
+        });
 
+    }
 
     /**
      * Message 内部移除后 ，looper找不到mStartTime归零防止误判
@@ -128,15 +134,23 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     @Override
     public void dispatchEnd() {
         super.dispatchEnd();
+        mANRHandler.removeCallbacksAndMessages(null);
         if (mStartTime > 0) {
-            long cost = SystemClock.uptimeMillis() - mStartTime;
-            collectInfoAndDispatch(ActivityStack.getInstance().getTopActivity(), cost, mInDoFrame);
+            final long cost = SystemClock.uptimeMillis() - mStartTime;
+            final boolean isDoFrame = mInDoFrame;
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    collectInfoAndDispatch(ActivityStack.getInstance().getTopActivity(), cost, isDoFrame);
+                }
+            });
             if (mInDoFrame) {
                 addFrameCallBack();
                 mInDoFrame = false;
             }
         }
     }
+
 
     private void addFrameCallBack() {
         addFrameCallback(CALLBACK_INPUT, new Runnable() {
