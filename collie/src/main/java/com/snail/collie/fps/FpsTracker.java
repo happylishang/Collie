@@ -16,6 +16,7 @@ import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
+import com.snail.collie.core.SingleTaskThreadPool;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -109,7 +110,8 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     public void dispatchStart() {
         super.dispatchStart();
         mStartTime = SystemClock.uptimeMillis();
-        AsyncTask.execute(new Runnable() {
+
+        SingleTaskThreadPool.getInstance().addTask(new Runnable() {
             @Override
             public void run() {
                 mANRHandler.postDelayed(new ANRMonitorRunnable(new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity())) {
@@ -124,7 +126,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
                 }, 5000);
             }
         });
-
     }
 
     /**
@@ -138,12 +139,13 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         if (mStartTime > 0) {
             final long cost = SystemClock.uptimeMillis() - mStartTime;
             final boolean isDoFrame = mInDoFrame;
-            AsyncTask.execute(new Runnable() {
+            SingleTaskThreadPool.getInstance().addTask(new Runnable() {
                 @Override
                 public void run() {
                     collectInfoAndDispatch(ActivityStack.getInstance().getTopActivity(), cost, isDoFrame);
                 }
             });
+
             if (mInDoFrame) {
                 addFrameCallBack();
                 mInDoFrame = false;
@@ -279,6 +281,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     public void pauseTrack(Application application) {
         LooperMonitor.unregister(this);
         mHandler.removeCallbacksAndMessages(null);
+        mANRHandler.removeCallbacksAndMessages(null);
         mITrackListeners.clear();
         mActivityCollectItemHashMap.clear();
         mStartTime = 0;
