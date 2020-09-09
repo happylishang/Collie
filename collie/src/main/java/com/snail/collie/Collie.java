@@ -163,7 +163,6 @@ public class Collie {
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityStarted(activity);
             }
-            FpsTracker.getInstance().addTrackerListener(mITrackListener);
         }
 
         @Override
@@ -219,6 +218,7 @@ public class Collie {
             MemoryLeakTrack.getInstance().addOnMemoryLeakListener(mITrackMemoryLeakListener);
         }
         if (config.userFpsTrack) {
+            FpsTracker.getInstance().addTrackerListener(mITrackListener);
             FpsTracker.getInstance().startTrack(application);
         }
         if (config.showDebugView) {
