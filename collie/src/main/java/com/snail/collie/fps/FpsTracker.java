@@ -125,10 +125,11 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         } else {
             mANRMonitorRunnable.activityRef = new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity());
         }
-
+        mANRMonitorRunnable.invalid = false;
         mLinkedBlockingQueue.add(new Runnable() {
             @Override
             public void run() {
+                mANRHandler.removeCallbacksAndMessages(null);
                 mANRHandler.postDelayed(mANRMonitorRunnable, 5000);
             }
         });
