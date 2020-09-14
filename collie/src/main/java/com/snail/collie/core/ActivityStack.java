@@ -13,7 +13,6 @@ public class ActivityStack {
     private static volatile ActivityStack sInstance = null;
     private List<Activity> mActivities = new ArrayList<>();
     private volatile int mCurrentSate;
-    private boolean mIsWarmLaunch;
 
     private ActivityStack() {
     }
@@ -33,9 +32,6 @@ public class ActivityStack {
         mActivities.add(0, activity);
     }
 
-    public boolean isWarmLaunch() {
-        return mIsWarmLaunch;
-    }
 
     public int getSize() {
         return mActivities.size();
@@ -43,7 +39,6 @@ public class ActivityStack {
 
     public void pop(Activity activity) {
         mActivities.remove(activity);
-        mIsWarmLaunch = true;
     }
 
     public void markStart() {

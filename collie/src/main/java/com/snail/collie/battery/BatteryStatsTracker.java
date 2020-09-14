@@ -59,7 +59,7 @@ public class BatteryStatsTracker implements ITracker {
                     @Override
                     public void run() {
                         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-                        android.content.Intent batteryStatus = application.registerReceiver(null, filter);
+                        Intent batteryStatus = application.registerReceiver(null, filter);
                         mStartPercent = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
                     }
                 });
@@ -114,7 +114,7 @@ public class BatteryStatsTracker implements ITracker {
         BatteryInfo batteryInfo = new BatteryInfo();
         try {
             IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            android.content.Intent batteryStatus = application.registerReceiver(null, filter);
+            Intent batteryStatus = application.registerReceiver(null, filter);
             int status = batteryStatus.getIntExtra("status", 0);
             boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                     status == BatteryManager.BATTERY_STATUS_FULL;

@@ -6,14 +6,13 @@ import java.lang.ref.WeakReference;
 
 public abstract class ANRMonitorRunnable implements Runnable {
 
-    public WeakReference<Activity> getActivityRef() {
-        return mActivityRef;
-    }
 
-    private WeakReference<Activity> mActivityRef;
+    public WeakReference<Activity> activityRef;
+    public boolean invalid;
 
     public ANRMonitorRunnable(WeakReference<Activity> mActivityRef) {
-        this.mActivityRef = mActivityRef;
+        this.activityRef = mActivityRef;
+        this.invalid = false;
     }
 
 }

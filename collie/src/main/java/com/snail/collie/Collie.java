@@ -218,7 +218,7 @@ public class Collie {
             MemoryLeakTrack.getInstance().addOnMemoryLeakListener(mITrackMemoryLeakListener);
         }
         if (config.userFpsTrack) {
-            FpsTracker.getInstance().addTrackerListener(mITrackListener);
+            FpsTracker.getInstance().setTrackerListener(mITrackListener);
             FpsTracker.getInstance().startTrack(application);
         }
         if (config.showDebugView) {

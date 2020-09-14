@@ -2,7 +2,6 @@ package com.snail.collie.fps;
 
 import android.app.Activity;
 import android.app.Application;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.Choreographer;
@@ -16,34 +15,34 @@ import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
-import com.snail.collie.core.SingleTaskThreadPool;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class FpsTracker extends LooperMonitor.LooperDispatchListener implements ITracker {
 
-    private HashSet<ITrackFpsListener> mITrackListeners = new HashSet<>();
+    private ITrackFpsListener mITrackListener;
     private Handler mHandler;
     private Handler mANRHandler;
-    private HashMap<Activity, CollectItem> mActivityCollectItemHashMap = new HashMap<>();
     private long mStartTime;
     private static FpsTracker sInstance = null;
+    private CollectItem mCollectItem;
+    private FpsThread mFpsThread;
+    private LinkedBlockingQueue<Runnable> mLinkedBlockingQueue = new LinkedBlockingQueue<>();
 
-    public synchronized void addTrackerListener(ITrackFpsListener listener) {
-        mITrackListeners.add(listener);
-    }
-
-    public synchronized void removeTrackerListener(ITrackFpsListener listener) {
-        mITrackListeners.remove(listener);
+    public synchronized void setTrackerListener(ITrackFpsListener listener) {
+        mITrackListener = listener;
     }
 
     private FpsTracker() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
         mANRHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+        mCollectItem = new CollectItem();
+        mFpsThread = new FpsThread(mLinkedBlockingQueue);
+        mFpsThread.start();
     }
 
     public static FpsTracker getInstance() {
@@ -69,6 +68,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     public static final int CALLBACK_TRAVERSAL = 2;
     private static final String ADD_CALLBACK = "addCallbackLocked";
     private boolean mInDoFrame = false;
+    private ANRMonitorRunnable mANRMonitorRunnable;
     private SimpleActivityLifecycleCallbacks mSimpleActivityLifecycleCallbacks = new SimpleActivityLifecycleCallbacks() {
 
 
@@ -109,22 +109,27 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     public void dispatchStart() {
         super.dispatchStart();
         mStartTime = SystemClock.uptimeMillis();
-
-        SingleTaskThreadPool.getInstance().addTask(new Runnable() {
-            @Override
-            public void run() {
-                mANRHandler.postDelayed(new ANRMonitorRunnable(new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity())) {
-                    @Override
-                    public void run() {
-                        if (this.getActivityRef() != null && this.getActivityRef().get() != null) {
-                            synchronized (FpsTracker.this) {
-                                for (ITrackFpsListener item : mITrackListeners) {
-                                    item.onANRAppear(this.getActivityRef().get());
-                                }
+        if (mANRMonitorRunnable == null) {
+            mANRMonitorRunnable = new ANRMonitorRunnable(new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity())) {
+                @Override
+                public void run() {
+                    if (this.activityRef != null && this.activityRef.get() != null && !this.invalid) {
+                        synchronized (FpsTracker.this) {
+                            if (mITrackListener != null) {
+                                mITrackListener.onANRAppear(this.activityRef.get());
                             }
                         }
                     }
-                }, 5000);
+                }
+            };
+        } else {
+            mANRMonitorRunnable.activityRef = new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity());
+        }
+
+        mLinkedBlockingQueue.add(new Runnable() {
+            @Override
+            public void run() {
+                mANRHandler.postDelayed(mANRMonitorRunnable, 5000);
             }
         });
     }
@@ -136,17 +141,16 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     @Override
     public void dispatchEnd() {
         super.dispatchEnd();
-        mANRHandler.removeCallbacksAndMessages(null);
+        mANRMonitorRunnable.invalid = true;
         if (mStartTime > 0) {
             final long cost = SystemClock.uptimeMillis() - mStartTime;
             final boolean isDoFrame = mInDoFrame;
-            SingleTaskThreadPool.getInstance().addTask(new Runnable() {
+            mLinkedBlockingQueue.add(new Runnable() {
                 @Override
                 public void run() {
                     collectInfoAndDispatch(ActivityStack.getInstance().getTopActivity(), cost, isDoFrame);
                 }
             });
-
             if (mInDoFrame) {
                 addFrameCallBack();
                 mInDoFrame = false;
@@ -162,33 +166,32 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
                 mInDoFrame = true;
             }
         }, true);
-
     }
 
     private void collectInfoAndDispatch(final Activity activity, final long cost, final boolean inDoFrame) {
+        //  不记录正常帧帧率
+        if (cost <= 16) {
+            mCollectItem.sumCost++;
+            mCollectItem.sumCost += Math.max(16, cost);
+            return;
+        }
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 synchronized (FpsTracker.this) {
                     if (activity != null) {
-                        CollectItem collectItem = mActivityCollectItemHashMap.get(activity);
-                        if (collectItem == null) {
-                            collectItem = new CollectItem();
-                            collectItem.activity = activity;
-                            mActivityCollectItemHashMap.put(activity, collectItem);
-                        }
-                        collectItem.sumCost += Math.max(16, cost);
-                        collectItem.sumFrame++;
-
-                        for (ITrackFpsListener item : mITrackListeners) {
-                            if (collectItem.sumFrame > 10) {
-                                long averageFps = Math.min(60, collectItem.sumCost > 0 ? collectItem.sumFrame * 1000 / collectItem.sumCost : 60);
-                                item.onFpsTrack(activity, cost, cost <= 16 ? 0 : Math.max(1, cost / 16 - 1), inDoFrame, averageFps);
+                        mCollectItem.activity = activity;
+                        mCollectItem.sumCost += Math.max(16, cost);
+                        mCollectItem.sumFrame++;
+                        if (mCollectItem.sumFrame > 3) {
+                            long averageFps = Math.min(60, mCollectItem.sumCost > 0 ? mCollectItem.sumFrame * 1000 / mCollectItem.sumCost : 60);
+                            if (mITrackListener != null) {
+                                mITrackListener.onFpsTrack(activity, cost, Math.max(1, cost / 16 - 1), inDoFrame, averageFps);
                             }
                         }
                         //   不过度累积
-                        if (collectItem.sumFrame > 60) {
-                            mActivityCollectItemHashMap.remove(activity);
+                        if (mCollectItem.sumFrame > 60) {
+                            resetCollectItem();
                         }
                     }
                 }
@@ -257,9 +260,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
 
     @Override
     public void destroy(Application application) {
-        synchronized (this) {
-            mITrackListeners.clear();
-        }
         sInstance = null;
     }
 
@@ -288,13 +288,17 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         LooperMonitor.unregister(this);
         mHandler.removeCallbacksAndMessages(null);
         mANRHandler.removeCallbacksAndMessages(null);
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mActivityCollectItemHashMap.clear();
-            }
-        });
+        try {
+            mLinkedBlockingQueue.clear();
+        } catch (Exception ignored) {
+        }
+        resetCollectItem();
         mStartTime = 0;
     }
 
+    private void resetCollectItem() {
+        mCollectItem.sumCost = 0;
+        mCollectItem.sumFrame = 0;
+        mCollectItem.activity = null;
+    }
 }

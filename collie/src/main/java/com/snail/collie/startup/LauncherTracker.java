@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 
@@ -23,9 +21,6 @@ import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.collie.debug.DebugHelper;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +29,7 @@ public class LauncherTracker implements ITracker {
 
     private static LauncherTracker sInstance;
     private Handler mHandler;
+    private boolean mIsColdStarUp = true;
 
     private LauncherTracker() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
@@ -106,7 +102,7 @@ public class LauncherTracker implements ITracker {
                         }
                     });
                 } else {
-                    activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+                    final ViewTreeObserver.OnWindowFocusChangeListener listener = new ViewTreeObserver.OnWindowFocusChangeListener() {
 
                         /**
                          * Called when the current {@link Window } of the activity gains or loses* focus.  This is the best indicator of whether this activity is visible
@@ -119,6 +115,18 @@ public class LauncherTracker implements ITracker {
                             collectInfo(activity);
                             activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
                         }
+                    };
+                    activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(listener);
+                    //   如果finish超前执行，那就在下一个消息是计算
+                    mUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (activity.isFinishing()) {
+                                collectInfo(activity);
+                                activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(listener);
+
+                            }
+                        }
                     });
                 }
 
@@ -126,15 +134,14 @@ public class LauncherTracker implements ITracker {
         }
     };
 
-    private void collectInfo(final Activity activity ) {
-        final boolean isColdStarUp = !ActivityStack.getInstance().isWarmLaunch()
-                && ActivityStack.getInstance().getBottomActivity() == activity;
+    private void collectInfo(final Activity activity) {
         final long coldLauncherTime = SystemClock.uptimeMillis() - LauncherHelpProvider.sStartUpTimeStamp;
         final long activityLauncherTime = SystemClock.uptimeMillis() - mActivityLauncherTimeStamp;
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (isColdStarUp) {
+                if (mIsColdStarUp) {
+                    mIsColdStarUp = false;
                     for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
                         launcherTrackListener.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName());
                     }
