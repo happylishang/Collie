@@ -172,7 +172,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     private void collectInfoAndDispatch(final Activity activity, final long cost, final boolean inDoFrame) {
         //  不记录正常帧帧率
         if (cost <= 16) {
-            mCollectItem.sumCost++;
+            mCollectItem.sumFrame++;
             mCollectItem.sumCost += Math.max(16, cost);
             return;
         }
