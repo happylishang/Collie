@@ -14,7 +14,7 @@
 
 
 
-### 使用方法
+### 使用方法 mavenCenter
 
 app的build.gradle添加
 
