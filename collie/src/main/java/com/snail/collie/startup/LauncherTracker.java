@@ -2,11 +2,13 @@ package com.snail.collie.startup;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 
@@ -162,6 +164,12 @@ public class LauncherTracker implements ITracker {
     @Override
     public void startTrack(Application application) {
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
+        try {
+            application.startService(new Intent(application, HelpService.class));
+        } catch (Throwable throable) {
+            Log.v("Collie","restart");
+            mIsColdStarUp = false;
+        }
     }
 
     @Override
