@@ -18,7 +18,7 @@
 
 app的build.gradle添加
 
-	   implementation 'com.snail:collie:1.0.59'
+	   implementation 'com.snail:collie:1.1.0'
 	   
 
 Application中添加
