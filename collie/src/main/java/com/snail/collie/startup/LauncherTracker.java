@@ -1,12 +1,14 @@
 package com.snail.collie.startup;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.ViewTreeObserver;
@@ -24,7 +26,10 @@ import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.collie.debug.DebugHelper;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
 
 
 public class LauncherTracker implements ITracker {
@@ -60,7 +65,8 @@ public class LauncherTracker implements ITracker {
         public void onActivityCreated(@NonNull final Activity activity, @Nullable Bundle bundle) {
             if (mActivityLauncherTimeStamp == 0 ||
                     ActivityStack.getInstance().getBottomActivity() == null
-                    || ActivityStack.getInstance().getBottomActivity() == activity) {
+                    || ActivityStack.getInstance().getBottomActivity() == activity
+                    || ActivityStack.getInstance().isInBackGround()) {
                 mActivityLauncherTimeStamp = SystemClock.uptimeMillis();
             }
             super.onActivityCreated(activity, bundle);
@@ -164,12 +170,8 @@ public class LauncherTracker implements ITracker {
     @Override
     public void startTrack(Application application) {
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
-        try {
-            application.startService(new Intent(application, HelpService.class));
-        } catch (Throwable throable) {
-            Log.v("Collie","restart");
-            mIsColdStarUp = false;
-        }
+        mIsColdStarUp = isForegroundProcess(application);
+        Log.v("Collie","mIsColdStarUp "+mIsColdStarUp);
     }
 
     @Override
@@ -194,4 +196,14 @@ public class LauncherTracker implements ITracker {
         void onActivityLaunchCost(Activity activity, long duration, boolean finishNow);
     }
 
+
+    public static boolean isForegroundProcess(Application application) {
+        List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = ((ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE)).getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo info : runningAppProcesses) {
+            if (Process.myPid() == info.pid) {
+                return info.importance == IMPORTANCE_FOREGROUND;
+            }
+        }
+        return false;
+    }
 }
