@@ -45,10 +45,6 @@ Application中添加
 	            @Override
 	            public void onActivityLaunchCost(Activity activity, long duration,boolean finishNow) {
 	                Log.v("Collie", "activity启动耗时 " + activity + " " + duration + " finishNow "+finishNow);
-	//                if (duration > 800) {
-	//                toast 可能导致短时间内存泄露
-	//                    Toast.makeText(activity, "耗时 " + duration + "ms", Toast.LENGTH_SHORT).show();
-	//                }
 	            }
 	
 	            @Override
