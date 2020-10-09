@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -65,8 +66,7 @@ public class LauncherTracker implements ITracker {
         public void onActivityCreated(@NonNull final Activity activity, @Nullable Bundle bundle) {
             if (mActivityLauncherTimeStamp == 0 ||
                     ActivityStack.getInstance().getBottomActivity() == null
-                    || ActivityStack.getInstance().getBottomActivity() == activity
-                    || ActivityStack.getInstance().isInBackGround()) {
+                    || ActivityStack.getInstance().getBottomActivity() == activity) {
                 mActivityLauncherTimeStamp = SystemClock.uptimeMillis();
             }
             super.onActivityCreated(activity, bundle);
@@ -83,6 +83,14 @@ public class LauncherTracker implements ITracker {
                     }
                 }
             });
+        }
+
+        @Override
+        public void onActivityStopped(@NonNull Activity activity) {
+            super.onActivityStopped(activity);
+            if (ActivityStack.getInstance().isInBackGround()) {
+                mActivityLauncherTimeStamp = 0;
+            }
         }
 
         @Override
@@ -140,6 +148,7 @@ public class LauncherTracker implements ITracker {
 
             }
         }
+
     };
 
     private void collectInfo(final Activity activity) {
@@ -171,7 +180,7 @@ public class LauncherTracker implements ITracker {
     public void startTrack(Application application) {
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
         mIsColdStarUp = isForegroundProcess(application);
-        Log.v("Collie","mIsColdStarUp "+mIsColdStarUp);
+        Log.v("Collie", "mIsColdStarUp " + mIsColdStarUp);
     }
 
     @Override
