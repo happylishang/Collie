@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.snail.labaffinity.app.MyButton;
 import com.snail.labaffinity.databinding.ActivitySecondBinding;
 import com.snail.labaffinity.utils.LogUtils;
 
@@ -24,31 +25,22 @@ public class LauncherTestActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        SystemClock.sleep(1000);
-        TextView textView = new TextView(this);
+        MyButton textView = new MyButton(this);
         textView.setText("LauncherTestActivity");
         setContentView(textView);
-//        finish();
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-//                SystemClock.sleep(3000);
-
-            }
-        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        SystemClock.sleep(3000);
-        finish();
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
 
-    }
 
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
+            }
+        });
+//        SystemClock.sleep(2000);
     }
 
     @Override

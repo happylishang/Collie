@@ -38,12 +38,21 @@
         <activity
 
             android:name=".activity.FpsTestActivity" />
-        <activity android:name=".activity.TrafficTestActivity" />
+        <activity
+            android:name=".activity.TrafficTestActivity"
+            android:theme="@style/translucent_activity_style"
+            android:exported="true">
+            <intent-filter>
+                <data android:scheme="labaffinity" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+
+
+        </activity>
         <activity android:name=".activity.LeakTestActivity" />
         <activity android:name=".activity.LauncherTestActivity" />
-        <activity
-            android:name=".activity.SplashActivity"
-            android:theme="@style/AppThemeBG">
+        <activity android:name=".activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

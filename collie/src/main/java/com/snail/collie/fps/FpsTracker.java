@@ -184,8 +184,10 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
                         mCollectItem.activity = activity;
                         mCollectItem.sumCost += Math.max(16, cost);
                         mCollectItem.sumFrame++;
-                        if (mCollectItem.sumFrame > 3) {
-                            long averageFps = Math.min(60, mCollectItem.sumCost > 0 ? mCollectItem.sumFrame * 1000 / mCollectItem.sumCost : 60);
+                        final long sumFrame = mCollectItem.sumFrame;
+                        final long sumCost = mCollectItem.sumCost;
+                        if (sumFrame > 3) {
+                            long averageFps = Math.min(60, sumCost > 0 ? sumFrame * 1000 / sumCost : 60);
                             if (mITrackListener != null) {
                                 mITrackListener.onFpsTrack(activity, cost, Math.max(1, cost / 16 - 1), inDoFrame, averageFps);
                             }

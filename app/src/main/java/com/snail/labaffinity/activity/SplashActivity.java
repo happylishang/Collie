@@ -7,6 +7,7 @@ import android.os.SystemClock;
 import android.widget.TextView;
 
 
+import com.snail.labaffinity.R;
 import com.snail.labaffinity.utils.LogUtils;
 
 import org.w3c.dom.Text;
@@ -21,13 +22,12 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_main);
 
-//        SystemClock.sleep(3000);
         new Handler().post(new Runnable() {
             @Override
             public void run() {
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
-
             }
         });
 
@@ -62,8 +62,10 @@ public class SplashActivity extends BaseActivity {
     //  第一帧的显示点，基本是在这里
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
+
         LogUtils.v("onWindowFocusChanged " + SystemClock.uptimeMillis());
         super.onWindowFocusChanged(hasFocus);
+//        SystemClock.sleep(5000);
     }
 
     protected void onPostResume() {
