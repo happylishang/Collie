@@ -57,15 +57,4 @@ public class ReflectMethod {
         return (T) mMethod.invoke(instance, args);
     }
 
-
-    public synchronized <T> T invokeWithoutThrow(Object instance, Object... args) {
-        try {
-            return invoke(instance, true, args);
-        } catch (NoSuchFieldException e) {
-        } catch (IllegalAccessException e) {
-        } catch (IllegalArgumentException e) {
-        } catch (InvocationTargetException e) {
-        }
-        return null;
-    }
 }
