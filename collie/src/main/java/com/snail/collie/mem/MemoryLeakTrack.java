@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+//WeakHashMap的Key-Value回收原理  还是依赖ref+Queue
 
 public class MemoryLeakTrack implements ITracker {
 
