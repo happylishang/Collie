@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.snail.collie.Collie;
 import com.snail.labaffinity.databinding.ActivitySecondBinding;
 import com.snail.labaffinity.utils.LogUtils;
 

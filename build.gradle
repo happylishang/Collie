@@ -10,7 +10,7 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        classpath 'com.android.tools.build:gradle:3.6.4'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1' // Add this line
         classpath 'com.google.gms:google-services:4.3.3'
@@ -25,7 +25,7 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         google()
-        mavenCentral()
+        maven {url 'https://maven.aliyun.com/repository/public'}
     }
 }
 
