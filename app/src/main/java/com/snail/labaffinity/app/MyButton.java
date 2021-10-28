@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.Button;
 
 public class MyButton extends androidx.appcompat.widget.AppCompatButton {
@@ -23,5 +24,7 @@ public class MyButton extends androidx.appcompat.widget.AppCompatButton {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         SystemClock.sleep(1000);
+
+        Log.v("Collie","onDraw");
     }
 }
