@@ -1,19 +1,17 @@
 package com.snail.collie.startup;
 
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.ViewTreeObserver;
-import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,8 +27,6 @@ import com.snail.collie.debug.DebugHelper;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
 
 
 public class LauncherTracker implements ITracker {
@@ -107,48 +103,20 @@ public class LauncherTracker implements ITracker {
         public void onActivityResumed(@NonNull final Activity activity) {
             super.onActivityResumed(activity);
             if (launcherFlag != 0 && (launcherFlag & resumeFlag) == 0) {
-                launcherFlag |= resumeFlag;
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                    //  P之后有改动，第一帧可见提前了 可以认为onActivityResumed之后
-                    mUIHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            //  执行完resume才可见，这里还没执行完
-                            collectInfo(activity);
-                        }
-                    });
-                } else {
-                    final ViewTreeObserver.OnWindowFocusChangeListener listener = new ViewTreeObserver.OnWindowFocusChangeListener() {
+                activity.getWindow().getDecorView().post(new Runnable() {
+                    @Override
+                    public void run() {
 
-                        /**
-                         * Called when the current {@link Window } of the activity gains or loses* focus.  This is the best indicator of whether this activity is visible
-                         * to the user.  The default implementation clears the key tracking
-                         * state, so should always be called.
-                         */
-                        @Override
-                        public void onWindowFocusChanged(boolean b) {
-                            // 可能resume立刻finish
-                            collectInfo(activity);
-                            activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
-                        }
-                    };
-                    activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(listener);
-                    //   如果finish超前执行，那就在下一个消息是计算
-                    mUIHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (activity.isFinishing()) {
+                        mUIHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
                                 collectInfo(activity);
-                                activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(listener);
-
                             }
-                        }
-                    });
-                }
-
+                        });
+                    }
+                });
             }
         }
-
     };
 
     private void collectInfo(final Activity activity) {
