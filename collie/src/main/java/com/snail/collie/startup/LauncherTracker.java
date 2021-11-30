@@ -38,6 +38,12 @@ public class LauncherTracker implements ITracker {
     private static LauncherTracker sInstance;
     private final Handler mHandler;
     private boolean markCodeStartUp;
+    private int launcherFlag;
+    private static int createFlag = 1;
+    private static int resumeFlag = 1 << 1;
+    private static int startFlag = createFlag | resumeFlag;
+    private long mActivityLauncherTimeStamp;
+    private Handler mUIHandler = new Handler(Looper.getMainLooper());
 
     private LauncherTracker() {
         mHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
@@ -54,12 +60,7 @@ public class LauncherTracker implements ITracker {
         return sInstance;
     }
 
-    private int launcherFlag;
-    private static int createFlag = 1;
-    private static int resumeFlag = 1 << 1;
-    private static int startFlag = createFlag | resumeFlag;
-    private long mActivityLauncherTimeStamp;
-    private Handler mUIHandler = new Handler(Looper.getMainLooper());
+
     private SimpleActivityLifecycleCallbacks mSimpleActivityLifecycleCallbacks = new SimpleActivityLifecycleCallbacks() {
 
         @Override
