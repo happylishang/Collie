@@ -12,15 +12,12 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
+import com.snail.kotlin.core.ActivityStack;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -60,7 +57,7 @@ public class MemoryLeakTrack implements ITracker {
         public void onActivityStopped(@NonNull final Activity activity) {
             super.onActivityStopped(activity);
             //  退后台，GC 找LeakActivity
-            if (!ActivityStack.getInstance().isInBackGround()) {
+            if (!ActivityStack.INSTANCE.isInBackGround()) {
                 return;
             }
             mHandler.postDelayed(new Runnable() {
@@ -75,7 +72,7 @@ public class MemoryLeakTrack implements ITracker {
                 @Override
                 public void run() {
                     try {
-                        if (!ActivityStack.getInstance().isInBackGround()) {
+                        if (!ActivityStack.INSTANCE.isInBackGround()) {
                             return;
                         }
                         //  分配大点内存促进GC
@@ -119,7 +116,7 @@ public class MemoryLeakTrack implements ITracker {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mMemoryListeners.size() > 0 && !ActivityStack.getInstance().isInBackGround()) {
+                if (mMemoryListeners.size() > 0 && !ActivityStack.INSTANCE.isInBackGround()) {
                     TrackMemoryInfo trackMemoryInfo = collectMemoryInfo(application);
                     for (ITrackMemoryListener listener : mMemoryListeners) {
                         listener.onCurrentMemoryCost(trackMemoryInfo);
@@ -188,7 +185,7 @@ public class MemoryLeakTrack implements ITracker {
 
         trackMemoryInfo.procName = ProcessUtil.getProcessName();
         trackMemoryInfo.display = display;
-        trackMemoryInfo.activityCount = ActivityStack.getInstance().getSize();
+        trackMemoryInfo.activityCount = ActivityStack.INSTANCE.getSize();
         return trackMemoryInfo;
     }
 

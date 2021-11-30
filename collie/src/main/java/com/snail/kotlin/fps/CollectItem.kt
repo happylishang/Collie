@@ -9,7 +9,7 @@ import android.app.Activity
  * version:
  */
 class CollectItem constructor(
-    activity: Activity,
+     activity: Activity,
     sumCost: Long,
     sumFrame: Int
 )

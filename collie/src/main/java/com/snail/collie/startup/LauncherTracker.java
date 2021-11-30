@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.ProcessUtil;
@@ -65,8 +63,8 @@ public class LauncherTracker implements ITracker {
         @Override
         public void onActivityCreated(@NonNull final Activity activity, @Nullable Bundle bundle) {
             if (mActivityLauncherTimeStamp == 0 ||
-                    ActivityStack.getInstance().getBottomActivity() == null
-                    || ActivityStack.getInstance().getBottomActivity() == activity) {
+                    ActivityStack.INSTANCE.getBottomActivity() == null
+                    || ActivityStack.INSTANCE.getBottomActivity() == activity) {
                 mActivityLauncherTimeStamp = SystemClock.uptimeMillis();
             }
             super.onActivityCreated(activity, bundle);
@@ -88,7 +86,7 @@ public class LauncherTracker implements ITracker {
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
             super.onActivityStopped(activity);
-            if (ActivityStack.getInstance().isInBackGround()) {
+            if (ActivityStack.INSTANCE.isInBackGround()) {
                 mActivityLauncherTimeStamp = 0;
             }
         }

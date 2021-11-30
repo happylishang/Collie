@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 
 import com.snail.collie.battery.BatteryInfo;
 import com.snail.collie.battery.BatteryStatsTracker;
-import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.debug.DebugHelper;
 import com.snail.collie.fps.FpsTracker;
@@ -18,8 +17,9 @@ import com.snail.collie.fps.ITrackFpsListener;
 import com.snail.collie.mem.MemoryLeakTrack;
 import com.snail.collie.mem.TrackMemoryInfo;
 import com.snail.collie.startup.LauncherTracker;
-import com.snail.collie.trafficstats.ITrackTrafficStatsListener;
-import com.snail.collie.trafficstats.TrafficStatsTracker;
+import com.snail.kotlin.core.ActivityStack;
+import com.snail.kotlin.trafficstats.ITrackTrafficStatsListener;
+import com.snail.kotlin.trafficstats.TrafficStatsTracker;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,7 +30,6 @@ public class Collie {
     private static volatile Collie sInstance = null;
     private Handler mHandler;
     private ITrackFpsListener mITrackListener;
-    private ITrackTrafficStatsListener mTrackTrafficStatsListener;
     private MemoryLeakTrack.ITrackMemoryListener mITrackMemoryLeakListener;
     private LauncherTracker.ILaunchTrackListener mILaunchTrackListener;
     private BatteryStatsTracker.IBatteryListener mIBatteryListener;
@@ -69,15 +68,6 @@ public class Collie {
             }
         };
 
-        mTrackTrafficStatsListener = new ITrackTrafficStatsListener() {
-            @Override
-            public void onTrafficStats(Activity activity, long value) {
-                for (CollieListener collieListener : mCollieListeners) {
-                    collieListener.onTrafficStats(activity, value);
-                }
-//                Log.v("Collie", "" + activityName + " 流量消耗 " + value * 1.0f / (1024 * 1024) + "M");
-            }
-        };
 
         mITrackMemoryLeakListener = new MemoryLeakTrack.ITrackMemoryListener() {
             @Override
@@ -100,21 +90,21 @@ public class Collie {
         };
         mILaunchTrackListener = new LauncherTracker.ILaunchTrackListener() {
             @Override
-            public void onAppColdLaunchCost(long duration ,String processName) {
+            public void onAppColdLaunchCost(long duration, String processName) {
 //                Log.v("Collie", "cold " + duration);
                 for (CollieListener collieListener : mCollieListeners) {
-                    collieListener.onAppColdLaunchCost(duration,processName);
+                    collieListener.onAppColdLaunchCost(duration, processName);
                 }
             }
 
             @Override
-            public void onActivityLaunchCost(Activity activity, long duration,boolean finishNow) {
+            public void onActivityLaunchCost(Activity activity, long duration, boolean finishNow) {
 ////                Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
 //                if(duration>800){
 //                    Toast.makeText(activity,"耗时 "+duration+"ms",Toast.LENGTH_SHORT).show();
 //                }
                 for (CollieListener collieListener : mCollieListeners) {
-                    collieListener.onActivityLaunchCost(activity, duration,finishNow);
+                    collieListener.onActivityLaunchCost(activity, duration, finishNow);
                 }
             }
         };
@@ -151,7 +141,7 @@ public class Collie {
     private Application.ActivityLifecycleCallbacks mActivityLifecycleCallback = new Application.ActivityLifecycleCallbacks() {
         @Override
         public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle bundle) {
-            ActivityStack.getInstance().push(activity);
+            ActivityStack.INSTANCE.push(activity);
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityCreated(activity, bundle);
             }
@@ -159,7 +149,7 @@ public class Collie {
 
         @Override
         public void onActivityStarted(@NonNull final Activity activity) {
-            ActivityStack.getInstance().markStart();
+            ActivityStack.INSTANCE.markStart();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityStarted(activity);
             }
@@ -181,7 +171,7 @@ public class Collie {
 
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
-            ActivityStack.getInstance().markStop();
+            ActivityStack.INSTANCE.markStop();
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityStopped(activity);
             }
@@ -199,7 +189,7 @@ public class Collie {
             for (Application.ActivityLifecycleCallbacks item : mActivityLifecycleCallbacks) {
                 item.onActivityDestroyed(activity);
             }
-            ActivityStack.getInstance().pop(activity);
+            ActivityStack.INSTANCE.pop(activity);
         }
     };
 
@@ -210,8 +200,15 @@ public class Collie {
         mCollieListeners.add(listener);
 
         if (config.userTrafficTrack) {
-            TrafficStatsTracker.getInstance().addTackTrafficStatsListener(mTrackTrafficStatsListener);
-            TrafficStatsTracker.getInstance().startTrack(application);
+            TrafficStatsTracker.INSTANCE.addTackTrafficStatsListener(new ITrackTrafficStatsListener() {
+                @Override
+                public void onTrafficStats(Activity activity, long value) {
+                    for (CollieListener collieListener : mCollieListeners) {
+                        collieListener.onTrafficStats(activity, value);
+                    }
+                }
+            });
+            TrafficStatsTracker.INSTANCE.startTrack(application);
         }
         if (config.userMemTrack) {
             MemoryLeakTrack.getInstance().startTrack(application);

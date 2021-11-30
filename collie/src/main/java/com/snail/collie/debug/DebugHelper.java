@@ -2,17 +2,15 @@ package com.snail.collie.debug;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
-import com.snail.collie.BuildConfig;
 import com.snail.collie.Collie;
-import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
+import com.snail.kotlin.core.ActivityStack;
 
 /**
  * 掉帧检测
@@ -29,7 +27,7 @@ public class DebugHelper implements ITracker {
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
             super.onActivityStopped(activity);
-            if (ActivityStack.getInstance().isInBackGround()) {
+            if (ActivityStack.INSTANCE.isInBackGround()) {
                 hide();
             }
         }
@@ -72,7 +70,7 @@ public class DebugHelper implements ITracker {
             @Override
             public void run() {
                 mFloatHelper.setView(mDebugCollieView)
-                        .show(ActivityStack.getInstance().getTopActivity());
+                        .show(ActivityStack.INSTANCE.getTopActivity());
             }
         });
     }

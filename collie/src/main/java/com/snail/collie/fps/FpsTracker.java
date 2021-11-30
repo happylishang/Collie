@@ -10,7 +10,6 @@ import android.view.ViewTreeObserver;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
@@ -19,7 +18,6 @@ import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class FpsTracker extends LooperMonitor.LooperDispatchListener implements ITracker {
@@ -110,7 +108,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         super.dispatchStart();
         mStartTime = SystemClock.uptimeMillis();
         if (mANRMonitorRunnable == null) {
-            mANRMonitorRunnable = new ANRMonitorRunnable(new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity())) {
+            mANRMonitorRunnable = new ANRMonitorRunnable(new WeakReference<Activity>(ActivityStack.INSTANCE.getTopActivity())) {
                 @Override
                 public void run() {
                     if (this.activityRef != null && this.activityRef.get() != null && !this.invalid) {
@@ -123,7 +121,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
                 }
             };
         } else {
-            mANRMonitorRunnable.activityRef = new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity());
+            mANRMonitorRunnable.activityRef = new WeakReference<Activity>(ActivityStack.INSTANCE.getTopActivity());
         }
         mANRMonitorRunnable.invalid = false;
         mLinkedBlockingQueue.add(new Runnable() {
@@ -149,7 +147,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
             mLinkedBlockingQueue.add(new Runnable() {
                 @Override
                 public void run() {
-                    collectInfoAndDispatch(ActivityStack.getInstance().getTopActivity(), cost, isDoFrame);
+                    collectInfoAndDispatch(ActivityStack.INSTANCE.getTopActivity(), cost, isDoFrame);
                 }
             });
             if (mInDoFrame) {

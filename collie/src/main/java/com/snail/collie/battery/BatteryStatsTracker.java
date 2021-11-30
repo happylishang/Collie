@@ -15,7 +15,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
@@ -23,7 +22,6 @@ import com.snail.collie.debug.DebugHelper;
 import com.snail.collie.startup.LauncherHelpProvider;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class BatteryStatsTracker implements ITracker {
@@ -54,7 +52,7 @@ public class BatteryStatsTracker implements ITracker {
         public void onActivityStarted(@NonNull Activity activity) {
             super.onActivityStarted(activity);
             final Application application = activity.getApplication();
-            if (mStartPercent == 0 && ActivityStack.getInstance().getTopActivity() == activity) {
+            if (mStartPercent == 0 && ActivityStack.INSTANCE.getTopActivity() == activity) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -70,7 +68,7 @@ public class BatteryStatsTracker implements ITracker {
         public void onActivityStopped(@NonNull final Activity activity) {
             super.onActivityStopped(activity);
             final Application application = activity.getApplication();
-            if (ActivityStack.getInstance().isInBackGround()) {
+            if (ActivityStack.INSTANCE.isInBackGround()) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
