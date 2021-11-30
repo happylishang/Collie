@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 
 import com.snail.collie.battery.BatteryInfo;
 import com.snail.collie.battery.BatteryStatsTracker;
-import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.debug.DebugHelper;
 import com.snail.collie.fps.FpsTracker;
 import com.snail.collie.fps.ITrackFpsListener;
@@ -18,6 +17,7 @@ import com.snail.collie.mem.MemoryLeakTrack;
 import com.snail.collie.mem.TrackMemoryInfo;
 import com.snail.collie.startup.LauncherTracker;
 import com.snail.kotlin.core.ActivityStack;
+import com.snail.kotlin.core.CollieHandlerThread;
 import com.snail.kotlin.trafficstats.ITrackTrafficStatsListener;
 import com.snail.kotlin.trafficstats.TrafficStatsTracker;
 
@@ -38,7 +38,7 @@ public class Collie {
     private HashSet<Application.ActivityLifecycleCallbacks> mActivityLifecycleCallbacks = new HashSet<>();
 
     private Collie() {
-        mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+        mHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
         mITrackListener = new ITrackFpsListener() {
             @Override
             public void onFpsTrack(final Activity activity, final long currentCostMils, final long currentDropFrame, final boolean isInFrameDraw, final long averageFps) {
@@ -244,6 +244,6 @@ public class Collie {
 
     public void stop(@NonNull Application application) {
         application.unregisterActivityLifecycleCallbacks(mActivityLifecycleCallback);
-        CollieHandlerThread.getInstance().getHandlerThread().quitSafely();
+        CollieHandlerThread.INSTANCE.quitSafely();
     }
 }

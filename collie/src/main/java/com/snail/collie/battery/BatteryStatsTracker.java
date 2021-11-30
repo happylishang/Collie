@@ -1,5 +1,6 @@
 package com.snail.collie.battery;
 
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.ContentResolver;
@@ -15,12 +16,11 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.collie.debug.DebugHelper;
-import com.snail.collie.startup.LauncherHelpProvider;
 import com.snail.kotlin.core.ActivityStack;
+import com.snail.kotlin.core.CollieHandlerThread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +30,10 @@ public class BatteryStatsTracker implements ITracker {
     private Handler mHandler;
     private String display;
     private int mStartPercent;
+    private static long sStartUpTimeStamp = SystemClock.uptimeMillis();
 
     private BatteryStatsTracker() {
-        mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+        mHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
     }
 
     public static BatteryStatsTracker getInstance() {
@@ -120,7 +121,7 @@ public class BatteryStatsTracker implements ITracker {
             int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
             batteryInfo.charging = isCharging;
             batteryInfo.cost = isCharging ? 0 : mStartPercent - batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-            batteryInfo.duration += (SystemClock.uptimeMillis() - LauncherHelpProvider.sStartUpTimeStamp) / 1000;
+            batteryInfo.duration += (SystemClock.uptimeMillis() - sStartUpTimeStamp) / 1000;
             batteryInfo.screenBrightness = getSystemScreenBrightnessValue(application);
             batteryInfo.display = display;
             batteryInfo.total = scale;

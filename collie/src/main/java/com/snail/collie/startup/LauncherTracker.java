@@ -18,11 +18,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.kotlin.core.ActivityStack;
+import com.snail.kotlin.core.CollieHandlerThread;
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,12 +33,14 @@ import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREG
 
 public class LauncherTracker implements ITracker {
 
+    private static long sStartUpTimeStamp = SystemClock.uptimeMillis();
+
     private static LauncherTracker sInstance;
     private final Handler mHandler;
     private boolean markCodeStartUp;
 
     private LauncherTracker() {
-        mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+        mHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
     }
 
     public static LauncherTracker getInstance() {
@@ -152,7 +154,7 @@ public class LauncherTracker implements ITracker {
     private void collectInfo(final Activity activity) {
         final long coldLauncherTime = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
                 SystemClock.uptimeMillis() - Process.getStartUptimeMillis() :
-                SystemClock.uptimeMillis() - LauncherHelpProvider.sStartUpTimeStamp;
+                SystemClock.uptimeMillis() - sStartUpTimeStamp;
         final long activityLauncherTime = SystemClock.uptimeMillis() - mActivityLauncherTimeStamp;
         mHandler.post(new Runnable() {
             @Override
@@ -180,6 +182,7 @@ public class LauncherTracker implements ITracker {
 
     @Override
     public void startTrack(Application application) {
+
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
         Log.v("Collie", "mIsColdStarUp " + markCodeStartUp);
     }

@@ -12,11 +12,11 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.kotlin.core.ActivityStack;
+import com.snail.kotlin.core.CollieHandlerThread;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,7 +43,7 @@ public class MemoryLeakTrack implements ITracker {
         return sInstance;
     }
 
-    private Handler mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+    private Handler mHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
     private WeakHashMap<Activity, String> mActivityStringWeakHashMap = new WeakHashMap<>();
     private SimpleActivityLifecycleCallbacks mSimpleActivityLifecycleCallbacks = new SimpleActivityLifecycleCallbacks() {
         @Override

@@ -10,7 +10,6 @@ import android.view.ViewTreeObserver;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
@@ -36,8 +35,8 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     }
 
     private FpsTracker() {
-        mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
-        mANRHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+        mHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
+        mANRHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
         mCollectItem = new CollectItem();
         mFpsThread = new FpsThread(mLinkedBlockingQueue);
         mFpsThread.start();

@@ -7,10 +7,10 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.kotlin.core.ActivityStack;
+import com.snail.kotlin.core.CollieHandlerThread;
 
 /**
  * 掉帧检测
@@ -40,7 +40,7 @@ public class DebugHelper implements ITracker {
     };
 
     private DebugHelper() {
-        mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+        mHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
     }
 
     public static DebugHelper getInstance() {
