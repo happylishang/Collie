@@ -41,7 +41,6 @@ public class LauncherTracker implements ITracker {
     private int launcherFlag;
     private static int createFlag = 1;
     private static int resumeFlag = 1 << 1;
-    private static int startFlag = createFlag | resumeFlag;
     private long mActivityLauncherTimeStamp;
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
 

@@ -20,7 +20,7 @@ object LauncherTracker : ITracker {
     private var startFlag = createFlag or resumeFlag
     private var mActivityLauncherTimeStamp: Long = 0
     private val mUIHandler = Handler(Looper.getMainLooper())
-    
+
     private val activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks =
         object : SimpleActivityLifecycleCallbacks() {
             override fun onActivityCreated(p0: Activity, p1: Bundle?) {
@@ -28,7 +28,6 @@ object LauncherTracker : ITracker {
                 if (mActivityLauncherTimeStamp == 0L) {
                     mActivityLauncherTimeStamp = SystemClock.uptimeMillis()
                 }
-
             }
 
             override fun onActivityResumed(p0: Activity) {
@@ -39,15 +38,23 @@ object LauncherTracker : ITracker {
                 super.onActivityPaused(p0)
                 mActivityLauncherTimeStamp = SystemClock.uptimeMillis()
             }
+
+            override fun onActivityStopped(p0: Activity) {
+                super.onActivityStopped(p0)
+            }
+
+            override fun onActivityDestroyed(p0: Activity) {
+                super.onActivityDestroyed(p0)
+            }
         }
 
 
     override fun destroy(application: Application) {
-
+        application.unregisterActivityLifecycleCallbacks(activityLifecycleCallbacks)
     }
 
     override fun startTrack(application: Application) {
-
+        application.registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
     }
 
     override fun pauseTrack(application: Application) {
