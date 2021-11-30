@@ -22,7 +22,6 @@ import com.snail.collie.core.CollieHandlerThread;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
-import com.snail.collie.debug.DebugHelper;
 import com.snail.kotlin.core.ActivityStack;
 
 import java.util.HashSet;
@@ -35,8 +34,8 @@ import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREG
 public class LauncherTracker implements ITracker {
 
     private static LauncherTracker sInstance;
-    private Handler mHandler;
-    private boolean mIsColdStarUp = true;
+    private final Handler mHandler;
+    private boolean markCodeStartUp;
 
     private LauncherTracker() {
         mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
@@ -44,7 +43,7 @@ public class LauncherTracker implements ITracker {
 
     public static LauncherTracker getInstance() {
         if (sInstance == null) {
-            synchronized (DebugHelper.class) {
+            synchronized (LauncherTracker.class) {
                 if (sInstance == null) {
                     sInstance = new LauncherTracker();
                 }
@@ -151,16 +150,20 @@ public class LauncherTracker implements ITracker {
     };
 
     private void collectInfo(final Activity activity) {
-        final long coldLauncherTime = SystemClock.uptimeMillis() - LauncherHelpProvider.sStartUpTimeStamp;
+        final long coldLauncherTime = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
+                SystemClock.uptimeMillis() - Process.getStartUptimeMillis() :
+                SystemClock.uptimeMillis() - LauncherHelpProvider.sStartUpTimeStamp;
         final long activityLauncherTime = SystemClock.uptimeMillis() - mActivityLauncherTimeStamp;
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (mIsColdStarUp) {
-                    mIsColdStarUp = false;
-                    for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
-                        launcherTrackListener.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName());
+                if (!markCodeStartUp) {
+                    if (isForegroundProcess(activity)) {
+                        for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
+                            launcherTrackListener.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName());
+                        }
                     }
+                    markCodeStartUp = true;
                 }
                 for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
                     launcherTrackListener.onActivityLaunchCost(activity, activityLauncherTime, activity.isFinishing());
@@ -178,8 +181,7 @@ public class LauncherTracker implements ITracker {
     @Override
     public void startTrack(Application application) {
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
-        mIsColdStarUp = isForegroundProcess(application);
-        Log.v("Collie", "mIsColdStarUp " + mIsColdStarUp);
+        Log.v("Collie", "mIsColdStarUp " + markCodeStartUp);
     }
 
     @Override
@@ -205,7 +207,8 @@ public class LauncherTracker implements ITracker {
     }
 
 
-    public static boolean isForegroundProcess(Application application) {
+    //  判断进程启动的时候是否是前台进程
+    public static boolean isForegroundProcess(Context application) {
         List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = ((ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE)).getRunningAppProcesses();
         for (ActivityManager.RunningAppProcessInfo info : runningAppProcesses) {
             if (Process.myPid() == info.pid) {

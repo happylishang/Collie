@@ -20,6 +20,7 @@ import com.snail.collie.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.collie.debug.DebugHelper;
 import com.snail.collie.startup.LauncherHelpProvider;
+import com.snail.kotlin.core.ActivityStack;
 
 import java.util.ArrayList;
 import java.util.List;

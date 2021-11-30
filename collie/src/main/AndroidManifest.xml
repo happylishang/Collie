@@ -8,7 +8,6 @@
             android:exported="false"
             android:multiprocess="true" />
         <receiver android:name=".battery.BatteryLevelReceiver" />
-        <service android:name=".startup.HelpService" />
     </application>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 </manifest>

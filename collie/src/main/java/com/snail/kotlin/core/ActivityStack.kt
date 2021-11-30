@@ -5,7 +5,7 @@ import java.util.ArrayList
 
 object ActivityStack {
 
-    private val mActivities: MutableList<Activity> = ArrayList()
+    private val mActivities: MutableList<Activity> = mutableListOf()
 
     @Volatile
     private var mCurrentSate = 0
