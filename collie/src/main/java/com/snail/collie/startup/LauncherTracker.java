@@ -23,6 +23,7 @@ import com.snail.collie.core.ITracker;
 import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.collie.debug.DebugHelper;
+import com.snail.kotlin.core.ActivityStack;
 
 import java.util.HashSet;
 import java.util.List;

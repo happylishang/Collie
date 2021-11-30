@@ -31,11 +31,11 @@ object ActivityStack {
     }
 
     fun getTopActivity(): Activity? {
-        return if (mActivities.size > 0) mActivities[0] else null
+        return   mActivities.first()
     }
 
     fun getBottomActivity(): Activity? {
-        return if (mActivities.size > 0) mActivities[mActivities.size - 1] else null
+        return mActivities.last()
     }
 
     fun isInBackGround(): Boolean {
