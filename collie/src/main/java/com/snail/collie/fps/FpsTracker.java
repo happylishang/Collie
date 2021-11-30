@@ -13,6 +13,8 @@ import com.snail.collie.Collie;
 import com.snail.collie.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
+import com.snail.kotlin.core.ActivityStack;
+import com.snail.kotlin.core.CollieHandlerThread;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
