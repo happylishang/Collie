@@ -12,7 +12,6 @@ object ActivityStack {
 
     fun push(activity: Activity) {
         mActivities.add(0, activity)
-        CollieHandlerThread.start()
     }
 
     fun getSize(): Int {

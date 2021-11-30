@@ -5,6 +5,7 @@ import android.app.Application
 import android.net.TrafficStats
 import android.os.Bundle
 import android.os.Process
+import com.snail.kotlin.Config
 import com.snail.kotlin.core.ITracker
 import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks
 

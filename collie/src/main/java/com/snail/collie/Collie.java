@@ -16,6 +16,7 @@ import com.snail.collie.fps.ITrackFpsListener;
 import com.snail.collie.mem.MemoryLeakTrack;
 import com.snail.collie.mem.TrackMemoryInfo;
 import com.snail.collie.startup.LauncherTracker;
+import com.snail.kotlin.Config;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;
 import com.snail.kotlin.trafficstats.ITrackTrafficStatsListener;
@@ -199,7 +200,7 @@ public class Collie {
         application.registerActivityLifecycleCallbacks(mActivityLifecycleCallback);
         mCollieListeners.add(listener);
 
-        if (config.userTrafficTrack) {
+        if (config.getUseStartUpTrack()) {
             TrafficStatsTracker.INSTANCE.addTackTrafficStatsListener(new ITrackTrafficStatsListener() {
                 @Override
                 public void onTrafficStats(Activity activity, long value) {
@@ -210,24 +211,24 @@ public class Collie {
             });
             TrafficStatsTracker.INSTANCE.startTrack(application);
         }
-        if (config.userMemTrack) {
+        if (config.getUseMemTrack()) {
             MemoryLeakTrack.getInstance().startTrack(application);
             MemoryLeakTrack.getInstance().addOnMemoryLeakListener(mITrackMemoryLeakListener);
         }
-        if (config.userFpsTrack) {
+        if (config.getUseFpsTrack()) {
             FpsTracker.getInstance().setTrackerListener(mITrackListener);
             FpsTracker.getInstance().startTrack(application);
         }
-        if (config.showDebugView) {
+        if (config.getShowDebugView()) {
             DebugHelper.getInstance().startTrack(application);
         }
 
-        if (config.userBatteryTrack) {
+        if (config.getUseBatteryTrack()) {
             BatteryStatsTracker.getInstance().addBatteryListener(mIBatteryListener);
             BatteryStatsTracker.getInstance().startTrack(application);
         }
 
-        if (config.userStartUpTrack) {
+        if (config.getUseStartUpTrack()) {
             LauncherTracker.getInstance().addLaunchTrackListener(mILaunchTrackListener);
             LauncherTracker.getInstance().startTrack(application);
         }
