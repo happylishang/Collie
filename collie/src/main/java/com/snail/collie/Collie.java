@@ -16,6 +16,7 @@ import com.snail.collie.fps.ITrackFpsListener;
 import com.snail.collie.mem.MemoryLeakTrack;
 import com.snail.collie.mem.TrackMemoryInfo;
 import com.snail.collie.startup.LauncherTracker;
+import com.snail.kotlin.CollieListener;
 import com.snail.kotlin.Config;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;
@@ -200,7 +201,7 @@ public class Collie {
         application.registerActivityLifecycleCallbacks(mActivityLifecycleCallback);
         mCollieListeners.add(listener);
 
-        if (config.getUseStartUpTrack()) {
+        if (config.getUseTrafficTrack()) {
             TrafficStatsTracker.INSTANCE.addTackTrafficStatsListener(new ITrackTrafficStatsListener() {
                 @Override
                 public void onTrafficStats(Activity activity, long value) {

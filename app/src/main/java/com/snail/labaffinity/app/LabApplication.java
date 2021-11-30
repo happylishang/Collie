@@ -2,22 +2,15 @@ package com.snail.labaffinity.app;
 
 import android.app.Activity;
 import android.app.Application;
-import android.os.SystemClock;
-import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.netease.nis.bugrpt.CrashHandler;
 import com.snail.collie.Collie;
-import com.snail.collie.CollieListener;
+import com.snail.kotlin.CollieListener;
 import com.snail.collie.battery.BatteryInfo;
 import com.snail.collie.mem.TrackMemoryInfo;
 import com.snail.kotlin.Config;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
 import cn.campusapp.router.Router;
 
