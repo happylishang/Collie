@@ -2,15 +2,19 @@ package com.snail.labaffinity.app;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.os.Debug;
 import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.netease.nis.bugrpt.CrashHandler;
 import com.snail.collie.Collie;
-import com.snail.kotlin.CollieListener;
 import com.snail.collie.battery.BatteryInfo;
-import com.snail.kotlin.mem.TrackMemoryInfo;
+import com.snail.kotlin.CollieListener;
 import com.snail.kotlin.Config;
+import com.snail.kotlin.mem.TrackMemoryInfo;
+
+import java.io.File;
 
 import cn.campusapp.router.Router;
 
@@ -23,6 +27,7 @@ import cn.campusapp.router.Router;
 public class LabApplication extends Application {
     @Override
     public void onCreate() {
+
 
         super.onCreate();
         CrashHandler.init(getApplicationContext());
@@ -42,18 +47,18 @@ public class LabApplication extends Application {
 
             @Override
             public void onBatteryCost(BatteryInfo batteryInfo) {
-                Log.v("Collie",  " 电量流量消耗 " +batteryInfo.cost);
+                Log.v("Collie", " 电量流量消耗 " + batteryInfo.cost);
 
             }
 
             @Override
-            public void onAppColdLaunchCost(long duration ,String processName) {
-                Log.v("Collie", "启动耗时 " + duration +" processName "+processName);
+            public void onAppColdLaunchCost(long duration, String processName) {
+                Log.v("Collie", "启动耗时 " + duration + " processName " + processName);
             }
 
             @Override
-            public void onActivityLaunchCost(Activity activity, long duration,boolean finishNow) {
-                Log.v("Collie", "activity启动耗时 " + activity + " " + duration + " finishNow "+finishNow);
+            public void onActivityLaunchCost(Activity activity, long duration, boolean finishNow) {
+                Log.v("Collie", "activity启动耗时 " + activity + " " + duration + " finishNow " + finishNow);
             }
 
             @Override
@@ -76,7 +81,7 @@ public class LabApplication extends Application {
 
             @Override
             public void onANRAppear(Activity activity) {
-                Log.v("Collie", "Activity " + activity + " ANR  " );
+                Log.v("Collie", "Activity " + activity + " ANR  ");
 
             }
         });
@@ -88,4 +93,8 @@ public class LabApplication extends Application {
         return sApplication;
     }
 
+    public static void startTrace(Context context) {
+        File file = new File(context.getExternalFilesDir("android"), "methods.trace");
+        Debug.startMethodTracing(file.getAbsolutePath(), 300 * 1024 * 1024);
+    }
 }

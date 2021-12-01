@@ -51,6 +51,7 @@ object LauncherTracker : ITracker {
                         p0.window.decorView.viewTreeObserver.addOnWindowFocusChangeListener(object :
                             ViewTreeObserver.OnWindowFocusChangeListener {
                             override fun onWindowFocusChanged(value: Boolean) {
+                                SystemClock.sleep(2000)
                                 if (value){
                                     collectInfo(p0,currentTimeStamp,false)
                                 }

@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.snail.labaffinity.BuildConfig;
+import com.snail.labaffinity.app.LabApplication;
 import com.snail.labaffinity.databinding.ActivityMainBinding;
 import com.snail.labaffinity.service.BackGroundService;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -31,6 +32,7 @@ public class MainActivity extends BaseActivity {
         mResultProfileBinding.contentMain1.activityStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                LabApplication.startTrace(MainActivity.this);
                 Intent mIntent=new Intent( MainActivity.this, LauncherTestActivity.class);
                 startActivity(mIntent);
             }

@@ -1,6 +1,7 @@
 package com.snail.labaffinity.activity;
 
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.ViewGroup;
@@ -32,13 +33,13 @@ public class LauncherTestActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        new Handler().post(new Runnable() {
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
+                Debug.stopMethodTracing();
 
             }
-        });
+        },10000);
 //        SystemClock.sleep(2000);
     }
 
