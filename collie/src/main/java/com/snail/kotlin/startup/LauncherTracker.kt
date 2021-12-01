@@ -4,9 +4,12 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
+import android.graphics.Canvas
 import android.os.*
 import android.util.Log
-import android.view.ViewTreeObserver
+import android.view.Choreographer
+import android.view.View
+import android.view.ViewGroup
 import com.snail.collie.core.ProcessUtil
 import com.snail.kotlin.core.CollieHandlerThread
 import com.snail.kotlin.core.ITracker
@@ -44,23 +47,7 @@ object LauncherTracker : ITracker {
                 super.onActivityResumed(p0)
                 if (launcherFlag == createFlag) {
                     val currentTimeStamp = lastActivityPauseTimeStamp
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        mUIHandler.post { collectInfo(p0, currentTimeStamp, false) }
-                    } else {
-                        //  低版本的生命周期跟高版本不同
-                        p0.window.decorView.viewTreeObserver.addOnWindowFocusChangeListener(object :
-                            ViewTreeObserver.OnWindowFocusChangeListener {
-                            override fun onWindowFocusChanged(value: Boolean) {
-                                SystemClock.sleep(2000)
-                                if (value){
-                                    collectInfo(p0,currentTimeStamp,false)
-                                }
-                                    p0.window.decorView.viewTreeObserver.removeOnWindowFocusChangeListener(
-                                        this
-                                    )
-                            }
-                        })
-                    }
+                    (p0.window.decorView as ViewGroup).addView(CustomerView(p0, currentTimeStamp))
                 }
                 launcherFlag = 0
             }
@@ -102,10 +89,7 @@ object LauncherTracker : ITracker {
     }
 
     private fun collectInfo(activity: Activity, lastPauseTimeStamp: Long, finishNow: Boolean) {
-        Log.v(
-            "Collie",
-            "collectInfo" + "  StartUpTimeStamp " + (SystemClock.uptimeMillis() - sStartUpTimeStamp)
-        )
+
         val currentTimeStamp = SystemClock.uptimeMillis()
         val activityStartCost = currentTimeStamp - lastPauseTimeStamp
         collectHandler.post {
@@ -142,4 +126,14 @@ object LauncherTracker : ITracker {
         fun onActivityLaunchCost(activity: Activity?, duration: Long, finishNow: Boolean)
     }
 
+    class CustomerView(val activity: Activity, private val lastPauseTimeStamp: Long) : View(activity) {
+
+        override fun onDraw(canvas: Canvas?) {
+            super.onDraw(canvas)
+            Log.v("Collie","CustomerView")
+            Choreographer.getInstance().postFrameCallback {
+                collectInfo(activity, lastPauseTimeStamp, false)
+            }
+        }
+    }
 }

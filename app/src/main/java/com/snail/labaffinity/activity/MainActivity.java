@@ -32,7 +32,7 @@ public class MainActivity extends BaseActivity {
         mResultProfileBinding.contentMain1.activityStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LabApplication.startTrace(MainActivity.this);
+//                LabApplication.startTrace(MainActivity.this);
                 Intent mIntent=new Intent( MainActivity.this, LauncherTestActivity.class);
                 startActivity(mIntent);
             }

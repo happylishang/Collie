@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Debug;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -94,7 +95,7 @@ public class LabApplication extends Application {
     }
 
     public static void startTrace(Context context) {
-        File file = new File(context.getExternalFilesDir("android"), "methods.trace");
+        File file = new File(context.getExternalFilesDir("android"), SystemClock.uptimeMillis()+"methods.trace");
         Debug.startMethodTracing(file.getAbsolutePath(), 300 * 1024 * 1024);
     }
 }

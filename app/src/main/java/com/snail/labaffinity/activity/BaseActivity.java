@@ -64,7 +64,6 @@ public class BaseActivity extends AppCompatActivity {
 
         LogUtils.v("onWindowFocusChanged " + this + SystemClock.uptimeMillis());
         super.onWindowFocusChanged(hasFocus);
-//        SystemClock.sleep(5000);
     }
 
     protected void onPostResume() {
