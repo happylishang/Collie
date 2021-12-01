@@ -15,11 +15,11 @@ import com.snail.collie.fps.FpsTracker;
 import com.snail.collie.fps.ITrackFpsListener;
 import com.snail.collie.mem.MemoryLeakTrack;
 import com.snail.collie.mem.TrackMemoryInfo;
-import com.snail.collie.startup.LauncherTracker;
 import com.snail.kotlin.CollieListener;
 import com.snail.kotlin.Config;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;
+import com.snail.kotlin.startup.LauncherTracker;
 import com.snail.kotlin.trafficstats.ITrackTrafficStatsListener;
 import com.snail.kotlin.trafficstats.TrafficStatsTracker;
 
@@ -87,26 +87,6 @@ public class Collie {
 //                        trackMemoryInfo.appMemory.nativePss);
                 for (CollieListener collieListener : mCollieListeners) {
                     collieListener.onCurrentMemoryCost(trackMemoryInfo);
-                }
-            }
-        };
-        mILaunchTrackListener = new LauncherTracker.ILaunchTrackListener() {
-            @Override
-            public void onAppColdLaunchCost(long duration, String processName) {
-//                Log.v("Collie", "cold " + duration);
-                for (CollieListener collieListener : mCollieListeners) {
-                    collieListener.onAppColdLaunchCost(duration, processName);
-                }
-            }
-
-            @Override
-            public void onActivityLaunchCost(Activity activity, long duration, boolean finishNow) {
-////                Log.v("Collie", "activity启动耗时 " + activity + " " + duration);
-//                if(duration>800){
-//                    Toast.makeText(activity,"耗时 "+duration+"ms",Toast.LENGTH_SHORT).show();
-//                }
-                for (CollieListener collieListener : mCollieListeners) {
-                    collieListener.onActivityLaunchCost(activity, duration, finishNow);
                 }
             }
         };
@@ -230,9 +210,23 @@ public class Collie {
         }
 
         if (config.getUseStartUpTrack()) {
-//            LauncherTracker.getInstance().mILaucherTrackListenerSet =mILaunchTrackListener;
-            LauncherTracker.In
-            LauncherTracker.getInstance().startTrack(application);
+            LauncherTracker.INSTANCE.setILaunchTrackListener(new LauncherTracker.ILaunchTrackListener() {
+                @Override
+                public void onAppColdLaunchCost(long duration, String processName) {
+                    for (CollieListener collieListener : mCollieListeners) {
+                        collieListener.onAppColdLaunchCost(duration, processName);
+                    }
+                }
+
+                @Override
+                public void onActivityLaunchCost(Activity activity, long duration, boolean finishNow) {
+                    for (CollieListener collieListener : mCollieListeners) {
+                        collieListener.onActivityLaunchCost(activity, duration, finishNow);
+                    }
+                }
+            });
+
+            LauncherTracker.INSTANCE.startTrack(application);
         }
 
     }

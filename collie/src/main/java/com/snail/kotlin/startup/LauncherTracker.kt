@@ -20,7 +20,7 @@ object LauncherTracker : ITracker {
     private var startFlag = createFlag or resumeFlag
     private var lastActivityPauseTimeStamp: Long = 0
     private val mUIHandler = Handler(Looper.getMainLooper())
-    private var iLaunchTrackListener: ILaunchTrackListener? = null
+      var iLaunchTrackListener: ILaunchTrackListener? = null
     private var sStartUpTimeStamp = 0L
     private val activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks =
         object : SimpleActivityLifecycleCallbacks() {
