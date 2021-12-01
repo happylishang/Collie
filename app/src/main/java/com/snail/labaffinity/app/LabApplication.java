@@ -28,13 +28,9 @@ import cn.campusapp.router.Router;
 public class LabApplication extends Application {
     @Override
     public void onCreate() {
-
-
         super.onCreate();
         CrashHandler.init(getApplicationContext());
-//        CrashReport.initCrashReport(getApplicationContext(), "e7f834a1e0", BuildConfig.DEBUG);
         sApplication = this;
-//        SystemClock.sleep(3000);
         Router.initBrowserRouter(this);
         Router.initActivityRouter(getApplicationContext());
         FirebaseAnalytics.getInstance(this);
