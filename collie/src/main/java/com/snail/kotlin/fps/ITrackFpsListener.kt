@@ -2,7 +2,7 @@ package com.snail.kotlin.fps
 
 import android.app.Activity
 
-interface ITrackerFpsListener {
+interface ITrackFpsListener {
 
     fun onFpsTrack(
         activity: Activity,

@@ -12,13 +12,13 @@ import com.snail.collie.battery.BatteryInfo;
 import com.snail.collie.battery.BatteryStatsTracker;
 import com.snail.collie.debug.DebugHelper;
 import com.snail.collie.fps.FpsTracker;
-import com.snail.collie.fps.ITrackFpsListener;
 import com.snail.collie.mem.MemoryLeakTrack;
 import com.snail.collie.mem.TrackMemoryInfo;
 import com.snail.kotlin.CollieListener;
 import com.snail.kotlin.Config;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;
+import com.snail.kotlin.fps.ITrackFpsListener;
 import com.snail.kotlin.startup.LauncherTracker;
 import com.snail.kotlin.trafficstats.ITrackTrafficStatsListener;
 import com.snail.kotlin.trafficstats.TrafficStatsTracker;
@@ -33,7 +33,6 @@ public class Collie {
     private Handler mHandler;
     private ITrackFpsListener mITrackListener;
     private MemoryLeakTrack.ITrackMemoryListener mITrackMemoryLeakListener;
-    private LauncherTracker.ILaunchTrackListener mILaunchTrackListener;
     private BatteryStatsTracker.IBatteryListener mIBatteryListener;
 
     private List<CollieListener> mCollieListeners = new ArrayList<>();

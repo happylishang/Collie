@@ -9,7 +9,8 @@ import android.app.Activity
  * version:
  */
 class CollectItem constructor(
-     activity: Activity,
-    sumCost: Long,
-    sumFrame: Int
+
+    @JvmField var activity: Activity? = null,
+    @JvmField var sumCost: Long = 0,
+    @JvmField var sumFrame: Int = 0
 )

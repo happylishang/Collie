@@ -1,6 +1,5 @@
 package com.snail.kotlin.fps
 
-import com.snail.kotlin.trafficstats.TrafficStatsTracker
 import java.util.concurrent.LinkedBlockingQueue
 
 /**
@@ -9,17 +8,13 @@ import java.util.concurrent.LinkedBlockingQueue
  * Des:
  * version:
  */
-class FpsThread : Thread() {
-
-
-    var mLinkedBlockingQueue: LinkedBlockingQueue<Runnable>? = null
-
+class FpsThread(var linkedBlockingQueue: LinkedBlockingQueue<Runnable>?) : Thread() {
 
     override fun run() {
         super.run()
         while (true) {
             try {
-                val runnable = mLinkedBlockingQueue?.take()
+                val runnable = linkedBlockingQueue?.take()
                 runnable?.run()
             } catch (ignored: Exception) {
             }

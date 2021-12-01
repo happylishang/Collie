@@ -15,6 +15,10 @@ import com.snail.collie.core.LooperMonitor;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;
+import com.snail.kotlin.fps.ANRMonitorRunnable;
+import com.snail.kotlin.fps.CollectItem;
+import com.snail.kotlin.fps.FpsThread;
+import com.snail.kotlin.fps.ITrackFpsListener;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -109,22 +113,23 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         super.dispatchStart();
         mStartTime = SystemClock.uptimeMillis();
         if (mANRMonitorRunnable == null) {
-            mANRMonitorRunnable = new ANRMonitorRunnable(new WeakReference<Activity>(ActivityStack.INSTANCE.getTopActivity())) {
+            mANRMonitorRunnable = new ANRMonitorRunnable(true, new WeakReference<>(ActivityStack.INSTANCE.getTopActivity())) {
                 @Override
                 public void run() {
-                    if (this.activityRef != null && this.activityRef.get() != null && !this.invalid) {
+                    this.getActivityRef();
+                    if (this.getActivityRef().get() != null && !this.getInvalid()) {
                         synchronized (FpsTracker.this) {
                             if (mITrackListener != null) {
-                                mITrackListener.onANRAppear(this.activityRef.get());
+                                mITrackListener.onANRAppear(this.getActivityRef().get());
                             }
                         }
                     }
                 }
             };
         } else {
-            mANRMonitorRunnable.activityRef = new WeakReference<Activity>(ActivityStack.INSTANCE.getTopActivity());
+            mANRMonitorRunnable.setActivityRef(new WeakReference<>(ActivityStack.INSTANCE.getTopActivity()));
         }
-        mANRMonitorRunnable.invalid = false;
+        mANRMonitorRunnable.setInvalid(false);
         mLinkedBlockingQueue.add(new Runnable() {
             @Override
             public void run() {
@@ -141,7 +146,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     @Override
     public void dispatchEnd() {
         super.dispatchEnd();
-        mANRMonitorRunnable.invalid = true;
+        mANRMonitorRunnable.setInvalid(true);
         if (mStartTime > 0) {
             final long cost = SystemClock.uptimeMillis() - mStartTime;
             final boolean isDoFrame = mInDoFrame;
