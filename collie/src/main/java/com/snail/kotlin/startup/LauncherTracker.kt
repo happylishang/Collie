@@ -45,7 +45,12 @@ object LauncherTracker : ITracker {
                 super.onActivityResumed(p0)
                 launcherFlag = launcherFlag or resumeFlag
                 val currentTimeStamp = lastActivityPauseTimeStamp
-                mUIHandler.post { collectInfo(p0, currentTimeStamp, false) }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    mUIHandler.post { collectInfo(p0, currentTimeStamp, false) }
+                } else {
+                    p0.window.decorView.post { collectInfo(p0, currentTimeStamp, false) }
+                }
+
             }
 
             override fun onActivityPaused(p0: Activity) {

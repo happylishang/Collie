@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.widget.Button;
 
 import com.snail.labaffinity.utils.LogUtils;
 
@@ -26,5 +25,17 @@ public class MyButton extends androidx.appcompat.widget.AppCompatTextView {
         super.onDraw(canvas);
         SystemClock.sleep(1000);
         LogUtils.v("onDraw");
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        LogUtils.v("onAttachedToWindow");
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+        LogUtils.v("onWindowFocusChanged");
     }
 }
