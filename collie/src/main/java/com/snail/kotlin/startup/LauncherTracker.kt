@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import com.snail.collie.core.ProcessUtil
 import com.snail.kotlin.core.CollieHandlerThread
 import com.snail.kotlin.core.ITracker
@@ -47,7 +48,24 @@ object LauncherTracker : ITracker {
                 super.onActivityResumed(p0)
                 if (launcherFlag == createFlag) {
                     val currentTimeStamp = lastActivityPauseTimeStamp
-                    (p0.window.decorView as ViewGroup).addView(CustomerView(p0, currentTimeStamp))
+                    (p0.window.decorView as ViewGroup).addView(InnerView(p0, currentTimeStamp))
+                    p0.window.decorView.viewTreeObserver.addOnWindowFocusChangeListener(object :
+                        ViewTreeObserver.OnWindowFocusChangeListener {
+                        override fun onWindowFocusChanged(hasFocus: Boolean) {
+                            if (hasFocus) {
+                                iLaunchTrackListener?.let {
+                                    it.onActivityFocusableCost(
+                                        p0,
+                                        SystemClock.uptimeMillis() - currentTimeStamp,
+                                        false
+                                    )
+                                }
+                            }
+                            p0.window.decorView.viewTreeObserver.removeOnWindowFocusChangeListener(
+                                this
+                            )
+                        }
+                    })
                 }
                 launcherFlag = 0
             }
@@ -90,21 +108,19 @@ object LauncherTracker : ITracker {
 
     private fun collectInfo(activity: Activity, lastPauseTimeStamp: Long, finishNow: Boolean) {
 
-        val currentTimeStamp = SystemClock.uptimeMillis()
-        val activityStartCost = currentTimeStamp - lastPauseTimeStamp
+        val markTimeStamp = SystemClock.uptimeMillis()
+        val activityStartCost = markTimeStamp - lastPauseTimeStamp
         collectHandler.post {
             iLaunchTrackListener?.let {
                 if (codeStartUp) {
                     val coldLauncherTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                        currentTimeStamp - Process.getStartUptimeMillis() else
-                        SystemClock.uptimeMillis() - sStartUpTimeStamp
+                        markTimeStamp - Process.getStartUptimeMillis() else
+                        markTimeStamp - sStartUpTimeStamp
                     it.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName())
                     codeStartUp = false
                 }
-
                 it.onActivityLaunchCost(activity, activityStartCost, finishNow)
             }
-
         }
 
     }
@@ -124,13 +140,13 @@ object LauncherTracker : ITracker {
     interface ILaunchTrackListener {
         fun onAppColdLaunchCost(duration: Long, procName: String?)
         fun onActivityLaunchCost(activity: Activity?, duration: Long, finishNow: Boolean)
+        fun onActivityFocusableCost(activity: Activity?, duration: Long, finishNow: Boolean)
     }
 
-    class CustomerView(val activity: Activity, private val lastPauseTimeStamp: Long) :
+    class InnerView(val activity: Activity, private val lastPauseTimeStamp: Long) :
         View(activity) {
         override fun onDraw(canvas: Canvas?) {
             super.onDraw(canvas)
-            Log.v("Collie", "CustomerView")
             Choreographer.getInstance().postFrameCallback {
                 collectInfo(activity, lastPauseTimeStamp, false)
             }

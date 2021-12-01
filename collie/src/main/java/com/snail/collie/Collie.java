@@ -211,6 +211,13 @@ public class Collie {
         if (config.getUseStartUpTrack()) {
             LauncherTracker.INSTANCE.setILaunchTrackListener(new LauncherTracker.ILaunchTrackListener() {
                 @Override
+                public void onActivityFocusableCost(@Nullable Activity activity, long duration, boolean finishNow) {
+                    for (CollieListener collieListener : mCollieListeners) {
+                        collieListener.onActivityFocusableCost(activity, duration, finishNow);
+                    }
+                }
+
+                @Override
                 public void onAppColdLaunchCost(long duration, String processName) {
                     for (CollieListener collieListener : mCollieListeners) {
                         collieListener.onAppColdLaunchCost(duration, processName);

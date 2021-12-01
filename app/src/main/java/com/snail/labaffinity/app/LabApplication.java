@@ -85,6 +85,12 @@ public class LabApplication extends Application {
                 Log.v("Collie", "Activity " + activity + " ANR  ");
 
             }
+
+            @Override
+            public void onActivityFocusableCost(Activity activity, long duration, boolean finishNow) {
+                Log.v("Collie", "Activity 获取焦点" + activity + " "+ duration   );
+
+            }
         });
     }
 

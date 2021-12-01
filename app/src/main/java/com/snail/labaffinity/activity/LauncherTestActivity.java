@@ -5,6 +5,7 @@ import android.os.SystemClock;
 
 import com.snail.labaffinity.app.MyButton;
 import com.snail.labaffinity.databinding.ActivitySecondBinding;
+import com.snail.labaffinity.utils.LogUtils;
 
 
 public class LauncherTestActivity extends BaseActivity {
@@ -33,12 +34,17 @@ public class LauncherTestActivity extends BaseActivity {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
+//        绘制之后
+        SystemClock.sleep(1000);
+        LogUtils.v( "onWindowFocusChanged");
+
         super.onWindowFocusChanged(hasFocus);
     }
 
     @Override
     public void onAttachedToWindow() {
+//        绘制之前
         super.onAttachedToWindow();
-        SystemClock.sleep(1000);
+//        SystemClock.sleep(1000);
     }
 }
