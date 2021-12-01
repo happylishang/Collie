@@ -17,6 +17,8 @@ import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;
+import com.snail.kotlin.mem.SystemMemory;
+import com.snail.kotlin.mem.TrackMemoryInfo;
 
 import java.util.HashMap;
 import java.util.HashSet;

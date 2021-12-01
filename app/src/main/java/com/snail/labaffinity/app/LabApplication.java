@@ -9,7 +9,7 @@ import com.netease.nis.bugrpt.CrashHandler;
 import com.snail.collie.Collie;
 import com.snail.kotlin.CollieListener;
 import com.snail.collie.battery.BatteryInfo;
-import com.snail.collie.mem.TrackMemoryInfo;
+import com.snail.kotlin.mem.TrackMemoryInfo;
 import com.snail.kotlin.Config;
 
 import cn.campusapp.router.Router;

@@ -47,7 +47,7 @@ object LauncherTracker : ITracker {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         mUIHandler.post { collectInfo(p0, currentTimeStamp, false) }
                     } else {
-                        //  低版本的声明周期跟高版本的不太一样
+                        //  低版本的生命周期跟高版本不同
                         p0.window.decorView.viewTreeObserver.addOnWindowFocusChangeListener(object :
                             ViewTreeObserver.OnWindowFocusChangeListener {
                             override fun onWindowFocusChanged(value: Boolean) {
