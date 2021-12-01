@@ -48,6 +48,7 @@ object LauncherTracker : ITracker {
             override fun onActivityPaused(p0: Activity) {
                 super.onActivityPaused(p0)
                 lastActivityPauseTimeStamp = SystemClock.uptimeMillis()
+                launcherFlag = 0
             }
 
             override fun onActivityStopped(p0: Activity) {
