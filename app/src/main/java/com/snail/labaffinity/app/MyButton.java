@@ -36,6 +36,8 @@ public class MyButton extends androidx.appcompat.widget.AppCompatTextView {
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
+
+        SystemClock.sleep(5000);
         LogUtils.v("onWindowFocusChanged");
     }
 }
