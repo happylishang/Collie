@@ -24,12 +24,9 @@ public class SplashActivity extends BaseActivity {
 
         setContentView(R.layout.activity_main);
 
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
+
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
-            }
-        });
+
         LogUtils.v("onCreate " + SystemClock.uptimeMillis());
     }
 

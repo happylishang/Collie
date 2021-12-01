@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.os.*
+import android.util.Log
 import com.snail.collie.core.ProcessUtil
 import com.snail.kotlin.core.CollieHandlerThread
 import com.snail.kotlin.core.ITracker
@@ -20,7 +21,7 @@ object LauncherTracker : ITracker {
     private var startFlag = createFlag or resumeFlag
     private var lastActivityPauseTimeStamp: Long = 0
     private val mUIHandler = Handler(Looper.getMainLooper())
-      var iLaunchTrackListener: ILaunchTrackListener? = null
+    var iLaunchTrackListener: ILaunchTrackListener? = null
     private var sStartUpTimeStamp = 0L
     private val activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks =
         object : SimpleActivityLifecycleCallbacks() {
@@ -31,9 +32,10 @@ object LauncherTracker : ITracker {
                     lastActivityPauseTimeStamp = SystemClock.uptimeMillis()
                 }
                 launcherFlag = createFlag
+                val currentTimeStamp = lastActivityPauseTimeStamp
                 mUIHandler.post {
                     if (p0.isFinishing) {
-                        collectInfo(p0, true)
+                        collectInfo(p0, currentTimeStamp, true)
                         lastActivityPauseTimeStamp = SystemClock.uptimeMillis()
                     }
                 }
@@ -42,7 +44,8 @@ object LauncherTracker : ITracker {
             override fun onActivityResumed(p0: Activity) {
                 super.onActivityResumed(p0)
                 launcherFlag = launcherFlag or resumeFlag
-                mUIHandler.post { collectInfo(p0, false) }
+                val currentTimeStamp = lastActivityPauseTimeStamp
+                mUIHandler.post { collectInfo(p0, currentTimeStamp, false) }
             }
 
             override fun onActivityPaused(p0: Activity) {
@@ -79,9 +82,13 @@ object LauncherTracker : ITracker {
 
     }
 
-    private fun collectInfo(activity: Activity, finishNow: Boolean) {
+    private fun collectInfo(activity: Activity, lastPauseTimeStamp: Long, finishNow: Boolean) {
+        Log.v(
+            "Collie",
+            "collectInfo" + "  StartUpTimeStamp " + (SystemClock.uptimeMillis() - sStartUpTimeStamp)
+        )
         val currentTimeStamp = SystemClock.uptimeMillis()
-        val activityStartCost = currentTimeStamp - lastActivityPauseTimeStamp
+        val activityStartCost = currentTimeStamp - lastPauseTimeStamp
         collectHandler.post {
             iLaunchTrackListener?.let {
                 if (codeStartUp) {
