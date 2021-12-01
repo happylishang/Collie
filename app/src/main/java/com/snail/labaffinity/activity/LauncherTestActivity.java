@@ -24,7 +24,6 @@ public class LauncherTestActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        SystemClock.sleep(1000);
         MyButton textView = new MyButton(this);
         textView.setText("LauncherTestActivity");
         setContentView(textView);

@@ -6,7 +6,9 @@ import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.widget.Button;
 
-public class MyButton extends androidx.appcompat.widget.AppCompatButton {
+import com.snail.labaffinity.utils.LogUtils;
+
+public class MyButton extends androidx.appcompat.widget.AppCompatTextView {
     public MyButton(Context context) {
         super(context);
     }
@@ -23,5 +25,6 @@ public class MyButton extends androidx.appcompat.widget.AppCompatButton {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         SystemClock.sleep(1000);
+        LogUtils.v("onDraw");
     }
 }
