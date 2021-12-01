@@ -126,11 +126,11 @@ object LauncherTracker : ITracker {
         fun onActivityLaunchCost(activity: Activity?, duration: Long, finishNow: Boolean)
     }
 
-    class CustomerView(val activity: Activity, private val lastPauseTimeStamp: Long) : View(activity) {
-
+    class CustomerView(val activity: Activity, private val lastPauseTimeStamp: Long) :
+        View(activity) {
         override fun onDraw(canvas: Canvas?) {
             super.onDraw(canvas)
-            Log.v("Collie","CustomerView")
+            Log.v("Collie", "CustomerView")
             Choreographer.getInstance().postFrameCallback {
                 collectInfo(activity, lastPauseTimeStamp, false)
             }
