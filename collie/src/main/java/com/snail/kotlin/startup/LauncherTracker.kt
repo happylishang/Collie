@@ -50,7 +50,9 @@ object LauncherTracker : ITracker {
                         p0.window.decorView.viewTreeObserver.addOnWindowFocusChangeListener(object :
                             ViewTreeObserver.OnWindowFocusChangeListener {
                             override fun onWindowFocusChanged(value: Boolean) {
-                                if (value)
+                                if (value){
+                                    collectInfo(p0,currentTimeStamp,false)
+                                }
                                     p0.window.decorView.viewTreeObserver.removeOnWindowFocusChangeListener(
                                         this
                                     )
