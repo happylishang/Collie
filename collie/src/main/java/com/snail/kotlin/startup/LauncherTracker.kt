@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import android.os.*
 import android.util.Log
+import android.view.ViewTreeObserver
 import com.snail.collie.core.ProcessUtil
 import com.snail.kotlin.core.CollieHandlerThread
 import com.snail.kotlin.core.ITracker
@@ -17,8 +18,6 @@ object LauncherTracker : ITracker {
     private var codeStartUp = false
     private var launcherFlag = 0
     private var createFlag = 1
-    private var resumeFlag = 1 shl 1
-    private var startFlag = createFlag or resumeFlag
     private var lastActivityPauseTimeStamp: Long = 0
     private val mUIHandler = Handler(Looper.getMainLooper())
     var iLaunchTrackListener: ILaunchTrackListener? = null
@@ -43,14 +42,23 @@ object LauncherTracker : ITracker {
 
             override fun onActivityResumed(p0: Activity) {
                 super.onActivityResumed(p0)
-                launcherFlag = launcherFlag or resumeFlag
-                val currentTimeStamp = lastActivityPauseTimeStamp
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    mUIHandler.post { collectInfo(p0, currentTimeStamp, false) }
-                } else {
-                    p0.window.decorView.post { collectInfo(p0, currentTimeStamp, false) }
+                if (launcherFlag == createFlag) {
+                    val currentTimeStamp = lastActivityPauseTimeStamp
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        mUIHandler.post { collectInfo(p0, currentTimeStamp, false) }
+                    } else {
+                        p0.window.decorView.viewTreeObserver.addOnWindowFocusChangeListener(object :
+                            ViewTreeObserver.OnWindowFocusChangeListener {
+                            override fun onWindowFocusChanged(value: Boolean) {
+                                if (value)
+                                    p0.window.decorView.viewTreeObserver.removeOnWindowFocusChangeListener(
+                                        this
+                                    )
+                            }
+                        })
+                    }
                 }
-
+                launcherFlag = 0
             }
 
             override fun onActivityPaused(p0: Activity) {
@@ -62,7 +70,7 @@ object LauncherTracker : ITracker {
             override fun onActivityStopped(p0: Activity) {
                 super.onActivityStopped(p0)
                 // 退到后台
-                if (launcherFlag != startFlag) {
+                if (launcherFlag == 0) {
                     launcherFlag = 0
                     lastActivityPauseTimeStamp = 0
                 }
