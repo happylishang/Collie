@@ -1,62 +1,118 @@
 package com.snail.kotlin.startup
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.Application
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
-import com.snail.collie.startup.LauncherTracker
+import android.content.Context
+import android.os.*
+import com.snail.collie.core.ProcessUtil
+import com.snail.kotlin.core.CollieHandlerThread
 import com.snail.kotlin.core.ITracker
 import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks
 
 object LauncherTracker : ITracker {
 
-    private var mHandler: Handler? = null
-    private var markCodeStartUp = false
+    private var collectHandler: Handler = Handler(CollieHandlerThread.looper)
+    private var codeStartUp = false
     private var launcherFlag = 0
     private var createFlag = 1
     private var resumeFlag = 1 shl 1
     private var startFlag = createFlag or resumeFlag
-    private var mActivityLauncherTimeStamp: Long = 0
+    private var lastActivityPauseTimeStamp: Long = 0
     private val mUIHandler = Handler(Looper.getMainLooper())
-
+    private var iLaunchTrackListener: ILaunchTrackListener? = null
+    private var sStartUpTimeStamp = 0L
     private val activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks =
         object : SimpleActivityLifecycleCallbacks() {
             override fun onActivityCreated(p0: Activity, p1: Bundle?) {
                 super.onActivityCreated(p0, p1)
-                if (mActivityLauncherTimeStamp == 0L) {
-                    mActivityLauncherTimeStamp = SystemClock.uptimeMillis()
+                // 重新开始或者第一个Activity
+                if (lastActivityPauseTimeStamp == 0L) {
+                    lastActivityPauseTimeStamp = SystemClock.uptimeMillis()
+                }
+                launcherFlag = createFlag
+                mUIHandler.post {
+                    if (p0.isFinishing) {
+                        collectInfo(p0, true)
+                        lastActivityPauseTimeStamp = SystemClock.uptimeMillis()
+                    }
                 }
             }
 
             override fun onActivityResumed(p0: Activity) {
                 super.onActivityResumed(p0)
+                launcherFlag = launcherFlag or resumeFlag
+                mUIHandler.post { collectInfo(p0, false) }
             }
 
             override fun onActivityPaused(p0: Activity) {
                 super.onActivityPaused(p0)
-                mActivityLauncherTimeStamp = SystemClock.uptimeMillis()
+                lastActivityPauseTimeStamp = SystemClock.uptimeMillis()
             }
 
             override fun onActivityStopped(p0: Activity) {
                 super.onActivityStopped(p0)
-            }
-
-            override fun onActivityDestroyed(p0: Activity) {
-                super.onActivityDestroyed(p0)
+                // 退到后台
+                if (launcherFlag != startFlag) {
+                    launcherFlag = 0
+                    lastActivityPauseTimeStamp = 0
+                }
             }
         }
 
 
     override fun destroy(application: Application) {
         application.unregisterActivityLifecycleCallbacks(activityLifecycleCallbacks)
+        iLaunchTrackListener = null
     }
 
     override fun startTrack(application: Application) {
+        sStartUpTimeStamp = SystemClock.uptimeMillis()
         application.registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
+        collectHandler.post {
+            codeStartUp = isForegroundProcess(application)
+        }
     }
 
     override fun pauseTrack(application: Application) {
+
     }
+
+    private fun collectInfo(activity: Activity, finishNow: Boolean) {
+        val currentTimeStamp = SystemClock.uptimeMillis()
+        val activityStartCost = currentTimeStamp - lastActivityPauseTimeStamp
+        collectHandler.post {
+            iLaunchTrackListener?.let {
+                if (codeStartUp) {
+                    val coldLauncherTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        currentTimeStamp - Process.getStartUptimeMillis() else
+                        SystemClock.uptimeMillis() - sStartUpTimeStamp
+                    it.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName())
+                    codeStartUp = false
+                }
+
+                it.onActivityLaunchCost(activity, activityStartCost, finishNow)
+            }
+
+        }
+
+    }
+
+    // 判断进程启动的时候是否是前台进程
+    private fun isForegroundProcess(context: Context): Boolean {
+        val runningAppProcesses =
+            (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).runningAppProcesses
+        for (info in runningAppProcesses) {
+            if (Process.myPid() == info.pid) {
+                return info.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+            }
+        }
+        return false
+    }
+
+    interface ILaunchTrackListener {
+        fun onAppColdLaunchCost(duration: Long, procName: String?)
+        fun onActivityLaunchCost(activity: Activity?, duration: Long, finishNow: Boolean)
+    }
+
 }

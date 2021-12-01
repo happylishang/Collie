@@ -30,7 +30,7 @@ public class SplashActivity extends BaseActivity {
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
             }
         });
-
+        finish();
         LogUtils.v("onCreate " + SystemClock.uptimeMillis());
     }
 
@@ -38,7 +38,7 @@ public class SplashActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         LogUtils.v("onStop " + SystemClock.uptimeMillis());
-        finish();
+
     }
 
     @Override

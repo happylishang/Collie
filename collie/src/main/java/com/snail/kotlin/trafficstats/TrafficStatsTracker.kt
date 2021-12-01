@@ -14,7 +14,7 @@ object TrafficStatsTracker : ITracker {
     private var currentStatsCost: Long = 0
     private var statsMap: MutableMap<Activity, TrafficStatsItem> = mutableMapOf()
     private var sequence: Int = 0
-    private var trafficStatsListener: MutableList<ITrackTrafficStatsListener> = mutableListOf()
+    var trafficStatsListener: ITrackTrafficStatsListener? = null
 
     private val applicationLife: SimpleActivityLifecycleCallbacks =
         object : SimpleActivityLifecycleCallbacks() {
@@ -35,9 +35,7 @@ object TrafficStatsTracker : ITracker {
             override fun onActivityDestroyed(p0: Activity) {
                 super.onActivityDestroyed(p0)
                 statsMap[p0]?.let { item ->
-                    trafficStatsListener.forEach {
-                        it.onTrafficStats(p0, item.trafficCost)
-                    }
+                    trafficStatsListener?.onTrafficStats(p0, item.trafficCost)
                 }
             }
         }
@@ -55,12 +53,5 @@ object TrafficStatsTracker : ITracker {
 
     }
 
-    fun addTackTrafficStatsListener(listener: ITrackTrafficStatsListener) {
-        trafficStatsListener.add(listener)
-    }
-
-    fun removeTrackTrafficStatsListener(listener: ITrackTrafficStatsListener) {
-        trafficStatsListener.remove(listener)
-    }
 
 }

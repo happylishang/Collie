@@ -202,7 +202,7 @@ public class Collie {
         mCollieListeners.add(listener);
 
         if (config.getUseTrafficTrack()) {
-            TrafficStatsTracker.INSTANCE.addTackTrafficStatsListener(new ITrackTrafficStatsListener() {
+            TrafficStatsTracker.INSTANCE.setTrafficStatsListener(new ITrackTrafficStatsListener() {
                 @Override
                 public void onTrafficStats(Activity activity, long value) {
                     for (CollieListener collieListener : mCollieListeners) {
@@ -230,7 +230,8 @@ public class Collie {
         }
 
         if (config.getUseStartUpTrack()) {
-            LauncherTracker.getInstance().addLaunchTrackListener(mILaunchTrackListener);
+//            LauncherTracker.getInstance().mILaucherTrackListenerSet =mILaunchTrackListener;
+            LauncherTracker.In
             LauncherTracker.getInstance().startTrack(application);
         }
 

@@ -159,16 +159,14 @@ public class LauncherTracker implements ITracker {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (!markCodeStartUp) {
-                    if (isForegroundProcess(activity)) {
-                        for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
-                            launcherTrackListener.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName());
-                        }
+                if (markCodeStartUp) {
+                    if (mILaucherTrackListenerSet != null) {
+                        mILaucherTrackListenerSet.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName());
                     }
-                    markCodeStartUp = true;
+                    markCodeStartUp = false;
                 }
-                for (ILaunchTrackListener launcherTrackListener : mILaucherTrackListenerSet) {
-                    launcherTrackListener.onActivityLaunchCost(activity, activityLauncherTime, activity.isFinishing());
+                if (mILaucherTrackListenerSet != null) {
+                    mILaucherTrackListenerSet.onActivityLaunchCost(activity, activityLauncherTime, activity.isFinishing());
                 }
 
             }
@@ -182,7 +180,7 @@ public class LauncherTracker implements ITracker {
 
     @Override
     public void startTrack(Application application) {
-
+        markCodeStartUp = isForegroundProcess(application);
         Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks);
         Log.v("Collie", "mIsColdStarUp " + markCodeStartUp);
     }
@@ -192,15 +190,8 @@ public class LauncherTracker implements ITracker {
 
     }
 
-    private Set<ILaunchTrackListener> mILaucherTrackListenerSet = new HashSet<>();
+   public ILaunchTrackListener mILaucherTrackListenerSet;
 
-    public void addLaunchTrackListener(ILaunchTrackListener laucherTrackListener) {
-        mILaucherTrackListenerSet.add(laucherTrackListener);
-    }
-
-    public void removeLaunchTrackListener(ILaunchTrackListener laucherTrackListener) {
-        mILaucherTrackListenerSet.remove(laucherTrackListener);
-    }
 
     public interface ILaunchTrackListener {
 
