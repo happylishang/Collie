@@ -34,7 +34,7 @@ public class LabApplication extends Application {
         Router.initBrowserRouter(this);
         Router.initActivityRouter(getApplicationContext());
         FirebaseAnalytics.getInstance(this);
-        Collie.getInstance().init(this, new Config(true, true, true, true, true, true), new CollieListener() {
+        Collie.getInstance().init(this, new Config(false, true, true, true, true, true), new CollieListener() {
 
             @Override
             public void onTrafficStats(Activity activity, long value) {
