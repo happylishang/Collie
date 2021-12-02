@@ -148,10 +148,17 @@ object LauncherTracker : ITracker {
         init {
             setBackgroundColor(Color.TRANSPARENT);
         }
+
         override fun onDraw(canvas: Canvas?) {
             super.onDraw(canvas)
             // 可以看做是draw的时机，之后就会交给GPU，误差可能在一个VSYNC
-            collectInfo(activity, lastPauseTimeStamp, false)
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                mUIHandler.post {
+                    collectInfo(activity, lastPauseTimeStamp, false)
+                }
+            } else {
+                collectInfo(activity, lastPauseTimeStamp, false)
+            }
         }
     }
 }
