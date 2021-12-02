@@ -23,7 +23,7 @@ public class MyButton extends androidx.appcompat.widget.AppCompatTextView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        SystemClock.sleep(1000);
+        SystemClock.sleep(300);
         LogUtils.v("onDraw");
     }
 
@@ -36,7 +36,7 @@ public class MyButton extends androidx.appcompat.widget.AppCompatTextView {
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
-        SystemClock.sleep(1000);
+        SystemClock.sleep(300);
         LogUtils.v("onWindowFocusChanged   慢");
     }
 }

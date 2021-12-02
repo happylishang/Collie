@@ -5,8 +5,8 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.os.*
-import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -47,14 +47,12 @@ object LauncherTracker : ITracker {
                 super.onActivityResumed(p0)
                 if (launcherFlag == createFlag) {
                     val currentTimeStamp = lastActivityPauseTimeStamp
-                    mUIHandler.post { SystemClock.sleep(500) }
                     (p0.window.decorView as ViewGroup).addView(InnerView(p0, currentTimeStamp))
                     p0.window.decorView.viewTreeObserver.addOnWindowFocusChangeListener(object :
                         ViewTreeObserver.OnWindowFocusChangeListener {
                         override fun onWindowFocusChanged(hasFocus: Boolean) {
 
                             if (hasFocus) {
-                                SystemClock.sleep(500)
                                 iLaunchTrackListener?.let {
                                     it.onActivityFocusableCost(
                                         p0,
@@ -147,11 +145,13 @@ object LauncherTracker : ITracker {
 
     class InnerView(val activity: Activity, private val lastPauseTimeStamp: Long) :
         View(activity) {
+        init {
+            setBackgroundColor(Color.TRANSPARENT);
+        }
         override fun onDraw(canvas: Canvas?) {
             super.onDraw(canvas)
-            Choreographer.getInstance().postFrameCallback {
-                collectInfo(activity, lastPauseTimeStamp, false)
-            }
+            // 可以看做是draw的时机，之后就会交给GPU，误差可能在一个VSYNC
+            collectInfo(activity, lastPauseTimeStamp, false)
         }
     }
 }

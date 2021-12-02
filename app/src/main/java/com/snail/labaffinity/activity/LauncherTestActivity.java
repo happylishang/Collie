@@ -34,10 +34,6 @@ public class LauncherTestActivity extends BaseActivity {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-//        绘制之后
-        SystemClock.sleep(1000);
-        LogUtils.v( "onWindowFocusChanged");
-
         super.onWindowFocusChanged(hasFocus);
     }
 
