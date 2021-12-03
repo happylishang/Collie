@@ -145,12 +145,18 @@ object LauncherTracker : ITracker {
 
     class InnerView(val activity: Activity, private val lastPauseTimeStamp: Long) :
         View(activity) {
+        var marked = false
+
         init {
             setBackgroundColor(Color.TRANSPARENT);
         }
 
         override fun onDraw(canvas: Canvas?) {
             super.onDraw(canvas)
+            if (marked) {
+                return
+            }
+            marked = true
             // 可以看做是draw的时机，之后就会交给GPU，误差可能在一个VSYNC
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                 mUIHandler.post {
