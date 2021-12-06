@@ -163,13 +163,7 @@ object LauncherTracker : ITracker {
             }
             marked = true
             // 可以看做是draw的时机，之后就会交给GPU，误差可能在一个VSYNC
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                mUIHandler.post {
-                    collectInfo(activity, lastPauseTimeStamp, false)
-                }
-            } else {
-                collectInfo(activity, lastPauseTimeStamp, false)
-            }
+            collectInfo(activity, lastPauseTimeStamp, false)
         }
     }
 }
