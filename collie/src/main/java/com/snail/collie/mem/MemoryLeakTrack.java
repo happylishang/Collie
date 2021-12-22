@@ -12,11 +12,12 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.ITracker;
+import com.snail.kotlin.core.ITracker;
 import com.snail.collie.core.ProcessUtil;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;
+import com.snail.kotlin.mem.AppMemory;
 import com.snail.kotlin.mem.SystemMemory;
 import com.snail.kotlin.mem.TrackMemoryInfo;
 

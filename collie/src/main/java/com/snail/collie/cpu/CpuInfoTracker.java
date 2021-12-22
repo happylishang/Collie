@@ -2,7 +2,7 @@ package com.snail.collie.cpu;
 
 import android.app.Application;
 
-import com.snail.collie.core.ITracker;
+import com.snail.kotlin.core.ITracker;
 
 public class CpuInfoTracker implements ITracker {
 

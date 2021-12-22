@@ -7,7 +7,7 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.collie.core.ITracker;
+import com.snail.kotlin.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;

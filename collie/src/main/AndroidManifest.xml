@@ -2,7 +2,7 @@
     package="com.snail.collie">
 
     <application>
-        <receiver android:name=".battery.BatteryLevelReceiver" />
+        <receiver android:name="com.snail.kotlin.battery.BatteryLevelReceiver" />
     </application>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 </manifest>

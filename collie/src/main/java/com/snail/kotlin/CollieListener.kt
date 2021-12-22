@@ -1,6 +1,6 @@
 package com.snail.kotlin
 
-import com.snail.collie.battery.BatteryStatsTracker.IBatteryListener
+import com.snail.kotlin.battery.BatteryStatsTracker.IBatteryListener
 import com.snail.collie.mem.MemoryLeakTrack.ITrackMemoryListener
 import com.snail.kotlin.fps.ITrackFpsListener
 import com.snail.kotlin.startup.LauncherTracker

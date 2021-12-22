@@ -1,7 +1,5 @@
 package com.snail.kotlin.mem
 
-import com.snail.collie.mem.AppMemory
-
 class TrackMemoryInfo {
     @JvmField
     var procName: String? = null

@@ -10,3 +10,4 @@ interface ITracker {
 
     fun pauseTrack(application: Application)
 }
+
