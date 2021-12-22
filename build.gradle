@@ -28,6 +28,7 @@ allprojects {
         maven { url "https://jitpack.io" }
         google()
         maven {url 'https://maven.aliyun.com/repository/public'}
+        mavenCentral()
     }
 }
 
