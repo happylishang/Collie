@@ -42,6 +42,11 @@ public class LabApplication extends Application {
         Collie.getInstance().init(this, new Config(true, true, true, true, true, true), new CollieListener() {
 
             @Override
+            public void onActivityFocusableCost(Activity activity, long duration, boolean finishNow) {
+
+            }
+
+            @Override
             public void onTrafficStats(Activity activity, long value) {
                 Log.v("Collie", "" + activity.getClass().getSimpleName() + " 流量消耗 " + value * 1.0f / (1024 * 1024) + "M");
 

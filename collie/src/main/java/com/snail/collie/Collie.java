@@ -100,6 +100,11 @@ public class Collie {
         };
         mILaunchTrackListener = new LauncherTracker.ILaunchTrackListener() {
             @Override
+            public void onActivityFocusableCost(@Nullable Activity activity, long duration, boolean finishNow) {
+
+            }
+
+            @Override
             public void onAppColdLaunchCost(long duration ,String processName) {
 //                Log.v("Collie", "cold " + duration);
                 for (CollieListener collieListener : mCollieListeners) {
@@ -231,8 +236,8 @@ public class Collie {
         }
 
         if (config.userStartUpTrack) {
-            LauncherTracker.getInstance().addLaunchTrackListener(mILaunchTrackListener);
-            LauncherTracker.getInstance().startTrack(application);
+            LauncherTracker.INSTANCE.setILaunchTrackListener(mILaunchTrackListener);
+            LauncherTracker.INSTANCE.startTrack(application);
         }
 
     }
