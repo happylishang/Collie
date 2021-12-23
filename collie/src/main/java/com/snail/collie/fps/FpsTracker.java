@@ -85,20 +85,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         @Override
         public void onActivityResumed(@NonNull final Activity activity) {
             super.onActivityResumed(activity);
-            activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
-                /**
-                 * Called when the current {@link Window } of the activity gains or loses* focus.  This is the best indicator of whether this activity is visible
-                 * to the user.  The default implementation clears the key tracking
-                 * state, so should always be called.
-                 */
-                @Override
-                public void onWindowFocusChanged(boolean b) {
-                    if (b) {
-                        resumeTrack();
-                        activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
-                    }
-                }
-            });
+            resumeTrack();
         }
     };
 
