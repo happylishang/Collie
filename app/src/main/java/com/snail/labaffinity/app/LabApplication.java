@@ -9,11 +9,11 @@ import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.netease.nis.bugrpt.CrashHandler;
-import com.snail.kotlin.Collie;
-import com.snail.kotlin.CollieListener;
-import com.snail.kotlin.Config;
-import com.snail.kotlin.battery.BatteryInfo;
-import com.snail.kotlin.mem.TrackMemoryInfo;
+import com.snail.collie.Collie;
+import com.snail.collie.CollieListener;
+import com.snail.collie.Config;
+import com.snail.collie.battery.BatteryInfo;
+import com.snail.collie.mem.TrackMemoryInfo;
 
 import java.io.File;
 
