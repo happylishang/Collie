@@ -5,13 +5,12 @@ import android.app.Application;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.Choreographer;
-import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
-import com.snail.kotlin.core.ITracker;
 import com.snail.collie.core.LooperMonitor;
+import com.snail.kotlin.core.ITracker;
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;
@@ -88,12 +87,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
             resumeTrack();
         }
     };
-
-
-    @Override
-    public boolean isValid() {
-        return true;
-    }
 
     @Override
     public void dispatchStart() {
@@ -255,6 +248,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     @Override
     public void destroy(Application application) {
         sInstance = null;
+        LooperMonitor.INSTANCE.release();
     }
 
 
@@ -273,13 +267,13 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
             addAnimationQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_ANIMATION], ADD_CALLBACK, long.class, Object.class, Object.class);
             addTraversalQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_TRAVERSAL], ADD_CALLBACK, long.class, Object.class, Object.class);
         }
-        LooperMonitor.register(this);
+        LooperMonitor.INSTANCE.register(this);
         addFrameCallBack();
     }
 
     @Override
     public void pauseTrack(Application application) {
-        LooperMonitor.unregister(this);
+        LooperMonitor.INSTANCE.unregister(this);
         mHandler.removeCallbacksAndMessages(null);
         mANRHandler.removeCallbacksAndMessages(null);
         try {
