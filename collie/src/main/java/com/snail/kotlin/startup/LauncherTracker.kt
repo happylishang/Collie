@@ -118,7 +118,7 @@ object LauncherTracker : ITracker {
                     val coldLauncherTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                         markTimeStamp - Process.getStartUptimeMillis() else
                         markTimeStamp - sStartUpTimeStamp
-                    it.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.processName)
+                    it.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName(activity.application))
                     codeStartUp = false
                 }
                 it.onActivityLaunchCost(activity, activityStartCost, finishNow)

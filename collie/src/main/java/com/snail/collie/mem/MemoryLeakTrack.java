@@ -186,7 +186,7 @@ public class MemoryLeakTrack implements ITracker {
         trackMemoryInfo.systemMemoryInfo = systemMemory;
         trackMemoryInfo.appMemory = appMemory;
 
-        trackMemoryInfo.procName = ProcessUtil.getProcessName();
+        trackMemoryInfo.procName = ProcessUtil.getProcessName(application);
         trackMemoryInfo.display = display;
         trackMemoryInfo.activityCount = ActivityStack.INSTANCE.getSize();
         return trackMemoryInfo;
