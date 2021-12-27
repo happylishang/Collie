@@ -1,4 +1,4 @@
-package com.snail.collie.debug
+package com.snail.kotlin.debug
 
 import android.util.Pair
 import android.view.View

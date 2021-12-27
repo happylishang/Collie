@@ -29,7 +29,7 @@ object LooperMonitor : MessageQueue.IdleHandler {
         } else {
             try {
                 val queue = ReflectUtils.get<MessageQueue>(looper?.javaClass, "mQueue", looper)
-                queue.addIdleHandler(this)
+                queue?.addIdleHandler(this)
             } catch (e: Exception) {
             }
         }
@@ -43,7 +43,7 @@ object LooperMonitor : MessageQueue.IdleHandler {
         } else {
             try {
                 val queue = ReflectUtils.get<MessageQueue>(looper.javaClass, "mQueue", looper)
-                queue.removeIdleHandler(this)
+                queue?.removeIdleHandler(this)
             } catch (e: Exception) {
             }
         }

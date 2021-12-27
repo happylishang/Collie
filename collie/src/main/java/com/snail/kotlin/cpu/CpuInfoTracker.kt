@@ -1,4 +1,4 @@
-package com.snail.collie.cpu
+package com.snail.kotlin.cpu
 
 import android.app.Application
 import com.snail.kotlin.core.ITracker

@@ -13,7 +13,7 @@ import android.util.Log
 import com.snail.collie.Collie
 import com.snail.kotlin.core.ITracker
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks
-import com.snail.collie.debug.DebugHelper
+import com.snail.kotlin.debug.DebugHelper
 import com.snail.kotlin.core.ActivityStack.getTopActivity
 import com.snail.kotlin.core.ActivityStack.isInBackGround
 import com.snail.kotlin.core.CollieHandlerThread

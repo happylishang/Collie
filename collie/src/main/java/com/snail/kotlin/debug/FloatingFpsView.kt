@@ -1,4 +1,4 @@
-package com.snail.collie.debug
+package com.snail.kotlin.debug
 
 import android.content.Context
 import android.util.AttributeSet

@@ -1,4 +1,4 @@
-package com.snail.collie.debug
+package com.snail.kotlin.debug
 
 import android.app.Activity
 import android.app.Application

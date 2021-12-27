@@ -9,9 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snail.kotlin.battery.BatteryStatsTracker;
-import com.snail.collie.debug.DebugHelper;
+import com.snail.kotlin.debug.DebugHelper;
 import com.snail.collie.fps.FpsTracker;
-import com.snail.collie.mem.MemoryLeakTrack;
+import com.snail.kotlin.mem.MemoryLeakTrack;
 import com.snail.kotlin.battery.BatteryInfo;
 import com.snail.kotlin.mem.TrackMemoryInfo;
 import com.snail.kotlin.CollieListener;

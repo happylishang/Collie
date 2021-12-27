@@ -1,4 +1,4 @@
-package com.snail.collie.debug
+package com.snail.kotlin.debug
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -13,20 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
-import com.snail.kotlin.core.ActivityStack.isInBackGround
-import com.snail.kotlin.core.ActivityStack.getTopActivity
-import com.snail.collie.debug.MeasureUtil
-import com.snail.kotlin.core.ITracker
-import com.snail.collie.debug.FloatingFpsView
-import com.snail.collie.debug.FloatHelper
-import com.snail.kotlin.core.ActivityStack
-import com.snail.collie.Collie
-import kotlin.jvm.Volatile
-import com.snail.collie.debug.DebugHelper
-import com.snail.kotlin.core.CollieHandlerThread
-import com.snail.collie.debug.FloatHelper.SimpleFloatWindow
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmOverloads
 
 /**
  * 悬浮窗，需权限
