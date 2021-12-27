@@ -7,11 +7,10 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.*
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import com.snail.collie.core.ProcessUtil
+import com.snail.kotlin.core.ProcessUtil
 import com.snail.kotlin.core.CollieHandlerThread
 import com.snail.kotlin.core.ITracker
 import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks

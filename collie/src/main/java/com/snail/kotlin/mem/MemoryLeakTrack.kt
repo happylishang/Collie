@@ -9,12 +9,12 @@ import android.os.Handler
 import android.os.SystemClock
 import android.text.TextUtils
 import com.snail.kotlin.core.ActivityStack.isInBackGround
-import com.snail.collie.core.ProcessUtil.getProcessName
+import com.snail.kotlin.core.ProcessUtil.getProcessName
 import com.snail.kotlin.core.ActivityStack.getSize
 import com.snail.kotlin.core.ITracker
 import com.snail.kotlin.core.CollieHandlerThread
 import com.snail.collie.Collie
-import com.snail.collie.core.SimpleActivityLifecycleCallbacks
+import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks
 import java.lang.Exception
 import java.util.*
 import kotlin.jvm.Volatile
@@ -74,12 +74,12 @@ class MemoryLeakTrack private constructor() : ITracker {
         }
 
     override fun destroy(application: Application) {
-        Collie.getInstance().removeActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
+        Collie.instance.removeActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
         mHandler.removeCallbacksAndMessages(null)
     }
 
     override fun startTrack(application: Application) {
-        Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
+        Collie.instance.addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
         mHandler.postDelayed(object : Runnable {
             override fun run() {
                 if (mMemoryListeners.size > 0 && !isInBackGround()) {

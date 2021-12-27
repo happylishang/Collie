@@ -1,4 +1,4 @@
-package com.snail.collie.core
+package com.snail.kotlin.core
 
 object ReflectUtils {
     @Throws(Exception::class)

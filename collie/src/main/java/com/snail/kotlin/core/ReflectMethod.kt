@@ -1,4 +1,4 @@
-package com.snail.collie.core
+package com.snail.kotlin.core
 
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method

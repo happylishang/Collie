@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Handler
 import com.snail.collie.Collie
-import com.snail.collie.core.SimpleActivityLifecycleCallbacks
+import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks
 import com.snail.kotlin.core.ActivityStack.getTopActivity
 import com.snail.kotlin.core.ActivityStack.isInBackGround
 import com.snail.kotlin.core.CollieHandlerThread
@@ -67,7 +67,7 @@ class DebugHelper private constructor() : ITracker {
 
     override fun destroy(application: Application) {}
     override fun startTrack(application: Application) {
-        Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
+        Collie.instance.addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
     }
 
     override fun pauseTrack(application: Application) {}

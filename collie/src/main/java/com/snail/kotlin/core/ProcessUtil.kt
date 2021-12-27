@@ -1,12 +1,9 @@
-package com.snail.collie.core
+package com.snail.kotlin.core
 
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Process
 import android.text.TextUtils
-import java.io.BufferedReader
-import java.io.FileReader
-import java.io.IOException
 
 object ProcessUtil {
     var sProcName: String? = null

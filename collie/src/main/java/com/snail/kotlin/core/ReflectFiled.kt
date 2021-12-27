@@ -1,9 +1,7 @@
-package com.snail.collie.core
+package com.snail.kotlin.core
 
 import kotlin.jvm.Synchronized
 import kotlin.Throws
-import com.snail.collie.core.ReflectFiled
-import com.snail.collie.core.ReflectMethod
 import java.lang.ClassCastException
 import java.lang.Exception
 import java.lang.IllegalArgumentException

@@ -12,7 +12,7 @@ import android.text.TextUtils
 import android.util.Log
 import com.snail.collie.Collie
 import com.snail.kotlin.core.ITracker
-import com.snail.collie.core.SimpleActivityLifecycleCallbacks
+import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks
 import com.snail.kotlin.debug.DebugHelper
 import com.snail.kotlin.core.ActivityStack.getTopActivity
 import com.snail.kotlin.core.ActivityStack.isInBackGround
@@ -55,11 +55,11 @@ class BatteryStatsTracker private constructor() : ITracker {
         }
 
     override fun destroy(application: Application) {
-        Collie.getInstance().removeActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
+        application.unregisterActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
     }
 
     override fun startTrack(application: Application) {
-        Collie.getInstance().addActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
+        application.registerActivityLifecycleCallbacks(mSimpleActivityLifecycleCallbacks)
         val intentFilter = IntentFilter()
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED)
     }

@@ -1,10 +1,9 @@
-package com.snail.collie.core
+package com.snail.kotlin.core
 
 import android.os.Build
 import android.os.Looper
 import android.os.MessageQueue
 import android.os.SystemClock
-import android.util.Log
 import android.util.Printer
 import androidx.annotation.CallSuper
 import java.lang.Exception
