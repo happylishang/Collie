@@ -13,7 +13,7 @@ import com.snail.kotlin.core.ProcessUtil.getProcessName
 import com.snail.kotlin.core.ActivityStack.getSize
 import com.snail.kotlin.core.ITracker
 import com.snail.kotlin.core.CollieHandlerThread
-import com.snail.collie.Collie
+import com.snail.kotlin.Collie
 import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks
 import java.lang.Exception
 import java.util.*

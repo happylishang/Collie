@@ -10,7 +10,6 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
-import com.snail.collie.Collie
 import com.snail.kotlin.core.ITracker
 import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks
 import com.snail.kotlin.debug.DebugHelper

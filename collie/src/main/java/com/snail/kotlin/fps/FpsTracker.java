@@ -1,4 +1,4 @@
-package com.snail.collie.fps;
+package com.snail.kotlin.fps;
 
 import android.app.Activity;
 import android.app.Application;
@@ -8,16 +8,12 @@ import android.view.Choreographer;
 
 import androidx.annotation.NonNull;
 
-import com.snail.collie.Collie;
+import com.snail.kotlin.Collie;
 import com.snail.kotlin.core.LooperMonitor;
 import com.snail.kotlin.core.ITracker;
 import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks;
 import com.snail.kotlin.core.ActivityStack;
 import com.snail.kotlin.core.CollieHandlerThread;
-import com.snail.kotlin.fps.ANRMonitorRunnable;
-import com.snail.kotlin.fps.CollectItem;
-import com.snail.kotlin.fps.FpsThread;
-import com.snail.kotlin.fps.ITrackFpsListener;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;

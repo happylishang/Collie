@@ -3,7 +3,7 @@ package com.snail.kotlin.debug
 import android.app.Activity
 import android.app.Application
 import android.os.Handler
-import com.snail.collie.Collie
+import com.snail.kotlin.Collie
 import com.snail.kotlin.core.SimpleActivityLifecycleCallbacks
 import com.snail.kotlin.core.ActivityStack.getTopActivity
 import com.snail.kotlin.core.ActivityStack.isInBackGround

@@ -1,4 +1,4 @@
-package com.snail.collie
+package com.snail.kotlin
 
 import android.app.Activity
 import android.app.Application
@@ -13,26 +13,23 @@ import com.snail.kotlin.startup.LauncherTracker.iLaunchTrackListener
 import com.snail.kotlin.fps.ITrackFpsListener
 import com.snail.kotlin.mem.MemoryLeakTrack.ITrackMemoryListener
 import com.snail.kotlin.battery.BatteryStatsTracker.IBatteryListener
-import com.snail.kotlin.CollieListener
 import com.snail.kotlin.trafficstats.TrafficStatsTracker
 import com.snail.kotlin.trafficstats.ITrackTrafficStatsListener
 import com.snail.kotlin.mem.MemoryLeakTrack
-import com.snail.collie.fps.FpsTracker
+import com.snail.kotlin.fps.FpsTracker
 import com.snail.kotlin.debug.DebugHelper
 import com.snail.kotlin.battery.BatteryStatsTracker
 import com.snail.kotlin.startup.LauncherTracker
 import com.snail.kotlin.startup.LauncherTracker.ILaunchTrackListener
 import com.snail.kotlin.core.CollieHandlerThread
 import kotlin.jvm.Volatile
-import com.snail.collie.Collie
-import com.snail.kotlin.Config
 import com.snail.kotlin.battery.BatteryInfo
 import com.snail.kotlin.mem.TrackMemoryInfo
 import java.util.ArrayList
 import java.util.HashSet
 
 class Collie private constructor() {
-    private val mHandler: Handler
+    private val mHandler: Handler = Handler(CollieHandlerThread.looper)
     private val mITrackListener: ITrackFpsListener
     private val mITrackMemoryLeakListener: ITrackMemoryListener
     private val mIBatteryListener: IBatteryListener
@@ -183,7 +180,6 @@ class Collie private constructor() {
     }
 
     init {
-        mHandler = Handler(CollieHandlerThread.looper)
         mITrackListener = object : ITrackFpsListener {
             override fun onFpsTrack(
                 activity: Activity,
