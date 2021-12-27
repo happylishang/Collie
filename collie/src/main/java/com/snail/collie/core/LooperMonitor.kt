@@ -99,8 +99,6 @@ object LooperMonitor : MessageQueue.IdleHandler {
 
     abstract class LooperDispatchListener {
         var isHasDispatchStart = false
-        open val isValid: Boolean
-            get() = false
 
         open fun dispatchStart() {}
         open fun dispatchEnd() {}
