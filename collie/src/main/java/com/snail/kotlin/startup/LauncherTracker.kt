@@ -47,7 +47,7 @@ object LauncherTracker : ITracker {
             override fun onActivityResumed(p0: Activity) {
                 super.onActivityResumed(p0)
                 if (launcherFlag == createFlag) {
-                    
+
                     val currentTimeStamp = lastActivityPauseTimeStamp
                     (p0.window.decorView as ViewGroup).addView(InnerView(p0, currentTimeStamp))
                     p0.window.decorView.viewTreeObserver.addOnWindowFocusChangeListener(object :
