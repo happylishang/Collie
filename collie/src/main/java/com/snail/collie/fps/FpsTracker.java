@@ -265,12 +265,12 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
             }
             addFrameCallBack();
         }
-        LooperMonitor.INSTANCE.register(this);
+        LooperMonitor.INSTANCE.registerListener(this);
     }
 
     @Override
     public void pauseTrack(Application application) {
-        LooperMonitor.INSTANCE.unregister(this);
+        LooperMonitor.INSTANCE.unregisterListener(this);
         mHandler.removeCallbacksAndMessages(null);
         mANRHandler.removeCallbacksAndMessages(null);
         try {

@@ -21,7 +21,6 @@ object LooperMonitor : MessageQueue.IdleHandler {
         addIdleHandler(looper)
     }
 
-    @Synchronized
     private fun addIdleHandler(looper: Looper) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             looper.queue.addIdleHandler(this)
@@ -35,7 +34,6 @@ object LooperMonitor : MessageQueue.IdleHandler {
     }
 
 
-    @Synchronized
     private fun removeIdleHandler(looper: Looper) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             looper.queue.removeIdleHandler(this)
@@ -117,6 +115,7 @@ object LooperMonitor : MessageQueue.IdleHandler {
 
     private val listeners = mutableSetOf<LooperDispatchListener>()
 
+    @Synchronized
     private fun dispatch(isBegin: Boolean, log: String) {
         for (listener in listeners) {
             if (isBegin) {
@@ -141,11 +140,13 @@ object LooperMonitor : MessageQueue.IdleHandler {
         }
     }
 
-    fun register(listener: LooperDispatchListener) {
+    @Synchronized
+    fun registerListener(listener: LooperDispatchListener) {
         listeners.add(listener)
     }
 
-    fun unregister(listener: LooperDispatchListener?) {
+    @Synchronized
+    fun unregisterListener(listener: LooperDispatchListener?) {
         listeners.remove(listener)
     }
 }
