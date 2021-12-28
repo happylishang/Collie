@@ -2,6 +2,7 @@ package com.snail.collie.fps;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.Choreographer;
@@ -31,7 +32,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     private FpsThread mFpsThread;
     private LinkedBlockingQueue<Runnable> mLinkedBlockingQueue = new LinkedBlockingQueue<>();
 
-    public synchronized void setTrackerListener(ITrackFpsListener listener) {
+    public  void setTrackerListener(ITrackFpsListener listener) {
         mITrackListener = listener;
     }
 
@@ -60,7 +61,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     private Method addInputQueue;
     private Method addAnimationQueue;
     private Choreographer choreographer;
-    private long frameIntervalNanos = 16666666;
     public static final int CALLBACK_INPUT = 0;
     public static final int CALLBACK_ANIMATION = 1;
     public static final int CALLBACK_TRAVERSAL = 2;
@@ -141,12 +141,14 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
 
 
     private void addFrameCallBack() {
-        addFrameCallback(CALLBACK_INPUT, new Runnable() {
-            @Override
-            public void run() {
-                mInDoFrame = true;
-            }
-        }, true);
+        //  该方法Android P以后无效
+
+            addFrameCallback(CALLBACK_INPUT, new Runnable() {
+                @Override
+                public void run() {
+                    mInDoFrame = true;
+                }
+            }, true);
     }
 
     private void collectInfoAndDispatch(final Activity activity, final long cost, final boolean inDoFrame) {
@@ -183,11 +185,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     }
 
 
-    public long getFrameIntervalNanos() {
-        return frameIntervalNanos;
-    }
-
-
     private Method reflectChoreographerMethod(Object instance, String name, Class<?>... argTypes) {
         try {
             Method method = instance.getClass().getDeclaredMethod(name, argTypes);
@@ -217,7 +214,10 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
      * 简化处理FPS的时候， 没必要区分的这么细
      **/
     private synchronized void addFrameCallback(int type, Runnable callback, boolean isAddHeader) {
-
+//        Android P 以后无效
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            return;
+        }
         try {
             synchronized (callbackQueueLock) {
                 Method method = null;
@@ -254,17 +254,20 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     }
 
     private void resumeTrack() {
-        if (choreographer == null) {
-            choreographer = Choreographer.getInstance();
-            callbackQueueLock = reflectObject(choreographer, "mLock");
-            callbackQueues = reflectObject(choreographer, "mCallbackQueues");
-            frameIntervalNanos = reflectObject(choreographer, "mFrameIntervalNanos");
-            addInputQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_INPUT], ADD_CALLBACK, long.class, Object.class, Object.class);
-            addAnimationQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_ANIMATION], ADD_CALLBACK, long.class, Object.class, Object.class);
-            addTraversalQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_TRAVERSAL], ADD_CALLBACK, long.class, Object.class, Object.class);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            if (choreographer == null) {
+                choreographer = Choreographer.getInstance();
+                callbackQueueLock = reflectObject(choreographer, "mLock");
+                callbackQueues = reflectObject(choreographer, "mCallbackQueues");
+                addInputQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_INPUT], ADD_CALLBACK, long.class, Object.class, Object.class);
+                addAnimationQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_ANIMATION], ADD_CALLBACK, long.class, Object.class, Object.class);
+                addTraversalQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_TRAVERSAL], ADD_CALLBACK, long.class, Object.class, Object.class);
+            }
+            addFrameCallBack();
         }
+
         LooperMonitor.INSTANCE.register(this);
-        addFrameCallBack();
+
     }
 
     @Override
