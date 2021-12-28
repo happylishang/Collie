@@ -265,9 +265,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
             }
             addFrameCallBack();
         }
-
         LooperMonitor.INSTANCE.register(this);
-
     }
 
     @Override
