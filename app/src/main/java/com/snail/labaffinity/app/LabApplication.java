@@ -7,8 +7,6 @@ import android.os.Debug;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.netease.nis.bugrpt.CrashHandler;
 import com.snail.collie.Collie;
 import com.snail.collie.CollieListener;
 import com.snail.collie.Config;
@@ -29,11 +27,9 @@ public class LabApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        CrashHandler.init(getApplicationContext());
         sApplication = this;
         Router.initBrowserRouter(this);
         Router.initActivityRouter(getApplicationContext());
-        FirebaseAnalytics.getInstance(this);
         Collie.getInstance().init(this, new Config(false, true, true, true, true, true), new CollieListener() {
 
             @Override
