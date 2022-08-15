@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.*
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -75,8 +76,6 @@ object LauncherTracker : ITracker {
                 super.onActivityPaused(p0)
                 lastActivityPauseTimeStamp = SystemClock.uptimeMillis()
                 launcherFlag = 0
-                //
-                codeStartUp = false
             }
 
             override fun onActivityStopped(p0: Activity) {
@@ -98,9 +97,7 @@ object LauncherTracker : ITracker {
     override fun startTrack(application: Application) {
         sStartUpTimeStamp = SystemClock.uptimeMillis()
         application.registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
-        collectHandler.post {
-            codeStartUp = isForegroundProcess(application)
-        }
+        codeStartUp = isForegroundProcess(application)
     }
 
     override fun pauseTrack(application: Application) {

@@ -24,6 +24,8 @@ import cn.campusapp.router.Router;
  * version:
  */
 public class LabApplication extends Application {
+
+    public static long sLaunchCost;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -47,6 +49,7 @@ public class LabApplication extends Application {
             @Override
             public void onAppColdLaunchCost(long duration, String processName) {
                 Log.v("Collie", "启动耗时 " + duration + " processName " + processName);
+                sLaunchCost = duration;
             }
 
             @Override

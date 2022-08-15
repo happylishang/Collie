@@ -1,5 +1,7 @@
 package com.snail.labaffinity.activity;
 
+import static com.snail.labaffinity.app.LabApplication.sLaunchCost;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ public class MainActivity extends BaseActivity {
     private int count;
     ActivityMainBinding mResultProfileBinding;
     long  start=SystemClock.uptimeMillis();
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -25,6 +28,8 @@ public class MainActivity extends BaseActivity {
         mResultProfileBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mResultProfileBinding.getRoot());
 
+
+        mResultProfileBinding.contentMain1.appStart.setText("冷启动耗时" +sLaunchCost);
         mResultProfileBinding.contentMain1.activityStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
