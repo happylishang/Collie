@@ -18,7 +18,7 @@
 
 app的build.gradle添加
 
-	    implementation 'io.github.happylishang:collie:1.1.4'
+	    implementation 'io.github.happylishang:collie:1.1.5'
 	  
  
 
