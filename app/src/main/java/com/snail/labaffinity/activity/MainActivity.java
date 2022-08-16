@@ -75,9 +75,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        new Handler().postDelayed((Runnable) () -> {
-            mResultProfileBinding.contentMain1.appStart.setText("冷启动耗时" + sLaunchCost);
-        }, 300);
+        new Handler().postDelayed((Runnable) () -> mResultProfileBinding.contentMain1.appStart.setText("冷启动耗时" + sLaunchCost), 300);
 
     }
 }

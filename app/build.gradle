@@ -45,7 +45,7 @@ dependencies {
     implementation project(path: ':collie')
       implementation 'io.github.happylishang:collie:1.1.8'
 //    annotationProcessor 'com.github.campusappcn.AndRouter:compiler:1.2.8'
-    implementation "androidx.core:core-ktx:+"
+    implementation "androidx.core:core-ktx:1.8.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 
