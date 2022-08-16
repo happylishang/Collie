@@ -11,14 +11,14 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import com.snail.collie.core.ProcessUtil
 import com.snail.collie.core.CollieHandlerThread
 import com.snail.collie.core.ITracker
-import com.snail.collie.core.ProcessUtil
 import com.snail.collie.core.SimpleActivityLifecycleCallbacks
 
 object LauncherTracker : ITracker {
 
-    private var collectHandler: Handler = Handler(CollieHandlerThread.getInstance().handlerThread.looper)
+    private var collectHandler: Handler = Handler(CollieHandlerThread.looper)
     private var codeStartUp = false
     private var launcherFlag = 0
     private var createFlag = 1
@@ -46,10 +46,7 @@ object LauncherTracker : ITracker {
 
             override fun onActivityResumed(p0: Activity) {
                 super.onActivityResumed(p0)
-                if (launcherFlag == createFlag) {                mUIHandler.post {
-
-                    SystemClock.sleep(5000)
-                    Log.v("Collie","postresume") }
+                if (launcherFlag == createFlag) {
 
                     val currentTimeStamp = lastActivityPauseTimeStamp
                     (p0.window.decorView as ViewGroup).addView(InnerView(p0, currentTimeStamp))
@@ -79,8 +76,6 @@ object LauncherTracker : ITracker {
                 super.onActivityPaused(p0)
                 lastActivityPauseTimeStamp = SystemClock.uptimeMillis()
                 launcherFlag = 0
-                //
-                codeStartUp = false
             }
 
             override fun onActivityStopped(p0: Activity) {
@@ -102,9 +97,7 @@ object LauncherTracker : ITracker {
     override fun startTrack(application: Application) {
         sStartUpTimeStamp = SystemClock.uptimeMillis()
         application.registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
-        collectHandler.post {
-            codeStartUp = isForegroundProcess(application)
-        }
+        codeStartUp = isForegroundProcess(application)
     }
 
     override fun pauseTrack(application: Application) {
@@ -121,7 +114,7 @@ object LauncherTracker : ITracker {
                     val coldLauncherTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                         markTimeStamp - Process.getStartUptimeMillis() else
                         markTimeStamp - sStartUpTimeStamp
-                    it.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName())
+                    it.onAppColdLaunchCost(coldLauncherTime, ProcessUtil.getProcessName(activity.application))
                     codeStartUp = false
                 }
                 it.onActivityLaunchCost(activity, activityStartCost, finishNow)

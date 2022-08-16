@@ -4,10 +4,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.Button;
 
-public class MyButton extends androidx.appcompat.widget.AppCompatButton {
+import com.snail.labaffinity.utils.LogUtils;
+
+public class MyButton extends androidx.appcompat.widget.AppCompatTextView {
     public MyButton(Context context) {
         super(context);
     }
@@ -23,8 +23,20 @@ public class MyButton extends androidx.appcompat.widget.AppCompatButton {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        SystemClock.sleep(1000);
+        SystemClock.sleep(300);
+        LogUtils.v("onDraw");
+    }
 
-        Log.v("Collie","onDraw");
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        LogUtils.v("onAttachedToWindow");
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+        SystemClock.sleep(300);
+        LogUtils.v("onWindowFocusChanged   慢");
     }
 }

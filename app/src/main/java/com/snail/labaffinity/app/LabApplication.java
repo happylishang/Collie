@@ -2,22 +2,18 @@ package com.snail.labaffinity.app;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.os.Debug;
 import android.os.SystemClock;
-import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.netease.nis.bugrpt.CrashHandler;
 import com.snail.collie.Collie;
 import com.snail.collie.CollieListener;
 import com.snail.collie.Config;
 import com.snail.collie.battery.BatteryInfo;
 import com.snail.collie.mem.TrackMemoryInfo;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.File;
 
 import cn.campusapp.router.Router;
 
@@ -28,18 +24,15 @@ import cn.campusapp.router.Router;
  * version:
  */
 public class LabApplication extends Application {
+
+    public static long sLaunchCost;
     @Override
     public void onCreate() {
-
         super.onCreate();
-        CrashHandler.init(getApplicationContext());
-//        CrashReport.initCrashReport(getApplicationContext(), "e7f834a1e0", BuildConfig.DEBUG);
         sApplication = this;
-//        SystemClock.sleep(3000);
         Router.initBrowserRouter(this);
         Router.initActivityRouter(getApplicationContext());
-        FirebaseAnalytics.getInstance(this);
-        Collie.getInstance().init(this, new Config(true, true, true, true, true, true), new CollieListener() {
+        Collie.getInstance().init(this, new Config(false, true, true, true, true, true), new CollieListener() {
 
             @Override
             public void onActivityFocusableCost(Activity activity, long duration, boolean finishNow) {
@@ -54,22 +47,19 @@ public class LabApplication extends Application {
 
             @Override
             public void onBatteryCost(BatteryInfo batteryInfo) {
-                Log.v("Collie",  " 电量流量消耗 " +batteryInfo.cost);
+                Log.v("Collie", " 电量流量消耗 " + batteryInfo.cost);
 
             }
 
             @Override
-            public void onAppColdLaunchCost(long duration ,String processName) {
-                Log.v("Collie", "启动耗时 " + duration +" processName "+processName);
+            public void onAppColdLaunchCost(long duration, String processName) {
+                Log.v("Collie", "启动耗时 " + duration + " processName " + processName);
+                sLaunchCost = duration;
             }
 
             @Override
-            public void onActivityLaunchCost(Activity activity, long duration,boolean finishNow) {
-                Log.v("Collie", "activity启动耗时 " + activity + " " + duration + " finishNow "+finishNow);
-//                if (duration > 800) {
-//                toast 可能导致短时间内存泄露
-//                    Toast.makeText(activity, "耗时 " + duration + "ms", Toast.LENGTH_SHORT).show();
-//                }
+            public void onActivityLaunchCost(Activity activity, long duration, boolean finishNow) {
+                Log.v("Collie", "activity启动耗时 " + activity + " " + duration + " finishNow " + finishNow);
             }
 
             @Override
@@ -92,7 +82,13 @@ public class LabApplication extends Application {
 
             @Override
             public void onANRAppear(Activity activity) {
-                Log.v("Collie", "Activity " + activity + " ANR  " );
+                Log.v("Collie", "Activity " + activity + " ANR  ");
+
+            }
+
+            @Override
+            public void onActivityFocusableCost(Activity activity, long duration, boolean finishNow) {
+                Log.v("Collie", "Activity 获取焦点" + activity + " "+ duration   );
 
             }
         });
@@ -104,4 +100,8 @@ public class LabApplication extends Application {
         return sApplication;
     }
 
+    public static void startTrace(Context context) {
+        File file = new File(context.getExternalFilesDir("android"), SystemClock.uptimeMillis()+"methods.trace");
+        Debug.startMethodTracing(file.getAbsolutePath(), 300 * 1024 * 1024);
+    }
 }

@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 33
     viewBinding {
         enabled = true
     }
@@ -42,18 +42,14 @@ dependencies {
     implementation 'io.reactivex:rxjava:1.1.8'
     implementation 'io.reactivex:rxandroid:1.2.1'
     implementation 'com.github.campusappcn.AndRouter:router:1.2.8'
-//    implementation project(path: ':collie')
-      implementation 'io.github.happylishang:collie:1.1.4'
-    annotationProcessor 'com.github.campusappcn.AndRouter:compiler:1.2.8'
-    implementation 'com.google.firebase:firebase-core:17.4.4'
-    implementation 'com.google.firebase:firebase-crashlytics-ndk:17.1.1'
-    implementation 'com.google.firebase:firebase-analytics:17.4.4'
-    implementation 'com.tencent.bugly:crashreport:3.2.33'
-    //其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.1.5
-    implementation 'com.tencent.bugly:nativecrashreport:3.7.47'
-//其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.2.0
-
-    implementation 'com.netease.nis.plugin:bugrpt:4.3.9'
+    implementation project(path: ':collie')
+      implementation 'io.github.happylishang:collie:1.1.8'
+//    annotationProcessor 'com.github.campusappcn.AndRouter:compiler:1.2.8'
+    implementation "androidx.core:core-ktx:1.8.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 
+}
+repositories {
+    mavenCentral()
 }

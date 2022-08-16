@@ -10,6 +10,6 @@ import android.util.Log;
  */
 public class LogUtils {
     public static void v(String msg) {
-        Log.v("lishang", msg);
+        Log.v("Collie", msg);
     }
 }

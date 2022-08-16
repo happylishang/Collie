@@ -23,6 +23,13 @@
             android:orientation="vertical">
 
             <Button
+                android:gravity="center"
+                android:id="@+id/app_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="冷启动耗时" />
+            <Button
+                android:gravity="center"
                 android:id="@+id/activity_start"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

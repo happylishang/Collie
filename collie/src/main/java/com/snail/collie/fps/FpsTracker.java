@@ -2,24 +2,23 @@ package com.snail.collie.fps;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.Choreographer;
-import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
 
 import com.snail.collie.Collie;
+import com.snail.collie.core.LooperMonitor;
+import com.snail.collie.core.ITracker;
+import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 import com.snail.collie.core.ActivityStack;
 import com.snail.collie.core.CollieHandlerThread;
-import com.snail.collie.core.ITracker;
-import com.snail.collie.core.LooperMonitor;
-import com.snail.collie.core.SimpleActivityLifecycleCallbacks;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class FpsTracker extends LooperMonitor.LooperDispatchListener implements ITracker {
@@ -33,13 +32,13 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     private FpsThread mFpsThread;
     private LinkedBlockingQueue<Runnable> mLinkedBlockingQueue = new LinkedBlockingQueue<>();
 
-    public synchronized void setTrackerListener(ITrackFpsListener listener) {
+    public  void setTrackerListener(ITrackFpsListener listener) {
         mITrackListener = listener;
     }
 
     private FpsTracker() {
-        mHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
-        mANRHandler = new Handler(CollieHandlerThread.getInstance().getHandlerThread().getLooper());
+        mHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
+        mANRHandler = new Handler(CollieHandlerThread.INSTANCE.getLooper());
         mCollectItem = new CollectItem();
         mFpsThread = new FpsThread(mLinkedBlockingQueue);
         mFpsThread.start();
@@ -62,7 +61,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     private Method addInputQueue;
     private Method addAnimationQueue;
     private Choreographer choreographer;
-    private long frameIntervalNanos = 16666666;
     public static final int CALLBACK_INPUT = 0;
     public static final int CALLBACK_ANIMATION = 1;
     public static final int CALLBACK_TRAVERSAL = 2;
@@ -82,50 +80,32 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
         @Override
         public void onActivityResumed(@NonNull final Activity activity) {
             super.onActivityResumed(activity);
-            activity.getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
-                /**
-                 * Called when the current {@link Window } of the activity gains or loses* focus.  This is the best indicator of whether this activity is visible
-                 * to the user.  The default implementation clears the key tracking
-                 * state, so should always be called.
-                 */
-                @Override
-                public void onWindowFocusChanged(boolean b) {
-                    if (b) {
-                        resumeTrack();
-                        activity.getWindow().getDecorView().getViewTreeObserver().removeOnWindowFocusChangeListener(this);
-                    }
-                }
-            });
+            resumeTrack();
         }
     };
-
-
-    @Override
-    public boolean isValid() {
-        return true;
-    }
 
     @Override
     public void dispatchStart() {
         super.dispatchStart();
         mStartTime = SystemClock.uptimeMillis();
         if (mANRMonitorRunnable == null) {
-            mANRMonitorRunnable = new ANRMonitorRunnable(new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity())) {
+            mANRMonitorRunnable = new ANRMonitorRunnable(true, new WeakReference<>(ActivityStack.INSTANCE.getTopActivity())) {
                 @Override
                 public void run() {
-                    if (this.activityRef != null && this.activityRef.get() != null && !this.invalid) {
+                    this.getActivityRef();
+                    if (this.getActivityRef().get() != null && !this.getInvalid()) {
                         synchronized (FpsTracker.this) {
                             if (mITrackListener != null) {
-                                mITrackListener.onANRAppear(this.activityRef.get());
+                                mITrackListener.onANRAppear(this.getActivityRef().get());
                             }
                         }
                     }
                 }
             };
         } else {
-            mANRMonitorRunnable.activityRef = new WeakReference<Activity>(ActivityStack.getInstance().getTopActivity());
+            mANRMonitorRunnable.setActivityRef(new WeakReference<>(ActivityStack.INSTANCE.getTopActivity()));
         }
-        mANRMonitorRunnable.invalid = false;
+        mANRMonitorRunnable.setInvalid(false);
         mLinkedBlockingQueue.add(new Runnable() {
             @Override
             public void run() {
@@ -142,14 +122,14 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     @Override
     public void dispatchEnd() {
         super.dispatchEnd();
-        mANRMonitorRunnable.invalid = true;
+        mANRMonitorRunnable.setInvalid(true);
         if (mStartTime > 0) {
             final long cost = SystemClock.uptimeMillis() - mStartTime;
             final boolean isDoFrame = mInDoFrame;
             mLinkedBlockingQueue.add(new Runnable() {
                 @Override
                 public void run() {
-                    collectInfoAndDispatch(ActivityStack.getInstance().getTopActivity(), cost, isDoFrame);
+                    collectInfoAndDispatch(ActivityStack.INSTANCE.getTopActivity(), cost, isDoFrame);
                 }
             });
             if (mInDoFrame) {
@@ -161,12 +141,14 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
 
 
     private void addFrameCallBack() {
-        addFrameCallback(CALLBACK_INPUT, new Runnable() {
-            @Override
-            public void run() {
-                mInDoFrame = true;
-            }
-        }, true);
+        //  该方法Android P以后无效
+
+            addFrameCallback(CALLBACK_INPUT, new Runnable() {
+                @Override
+                public void run() {
+                    mInDoFrame = true;
+                }
+            }, true);
     }
 
     private void collectInfoAndDispatch(final Activity activity, final long cost, final boolean inDoFrame) {
@@ -203,11 +185,6 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     }
 
 
-    public long getFrameIntervalNanos() {
-        return frameIntervalNanos;
-    }
-
-
     private Method reflectChoreographerMethod(Object instance, String name, Class<?>... argTypes) {
         try {
             Method method = instance.getClass().getDeclaredMethod(name, argTypes);
@@ -237,7 +214,10 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
      * 简化处理FPS的时候， 没必要区分的这么细
      **/
     private synchronized void addFrameCallback(int type, Runnable callback, boolean isAddHeader) {
-
+//        Android P 以后无效
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            return;
+        }
         try {
             synchronized (callbackQueueLock) {
                 Method method = null;
@@ -264,6 +244,7 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     @Override
     public void destroy(Application application) {
         sInstance = null;
+        LooperMonitor.INSTANCE.release();
     }
 
 
@@ -273,22 +254,23 @@ public class FpsTracker extends LooperMonitor.LooperDispatchListener implements 
     }
 
     private void resumeTrack() {
-        if (choreographer == null) {
-            choreographer = Choreographer.getInstance();
-            callbackQueueLock = reflectObject(choreographer, "mLock");
-            callbackQueues = reflectObject(choreographer, "mCallbackQueues");
-            frameIntervalNanos = reflectObject(choreographer, "mFrameIntervalNanos");
-            addInputQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_INPUT], ADD_CALLBACK, long.class, Object.class, Object.class);
-            addAnimationQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_ANIMATION], ADD_CALLBACK, long.class, Object.class, Object.class);
-            addTraversalQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_TRAVERSAL], ADD_CALLBACK, long.class, Object.class, Object.class);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            if (choreographer == null) {
+                choreographer = Choreographer.getInstance();
+                callbackQueueLock = reflectObject(choreographer, "mLock");
+                callbackQueues = reflectObject(choreographer, "mCallbackQueues");
+                addInputQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_INPUT], ADD_CALLBACK, long.class, Object.class, Object.class);
+                addAnimationQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_ANIMATION], ADD_CALLBACK, long.class, Object.class, Object.class);
+                addTraversalQueue = reflectChoreographerMethod(callbackQueues[CALLBACK_TRAVERSAL], ADD_CALLBACK, long.class, Object.class, Object.class);
+            }
+            addFrameCallBack();
         }
-        LooperMonitor.register(this);
-        addFrameCallBack();
+        LooperMonitor.INSTANCE.registerListener(this);
     }
 
     @Override
     public void pauseTrack(Application application) {
-        LooperMonitor.unregister(this);
+        LooperMonitor.INSTANCE.unregisterListener(this);
         mHandler.removeCallbacksAndMessages(null);
         mANRHandler.removeCallbacksAndMessages(null);
         try {
