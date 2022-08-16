@@ -43,8 +43,8 @@ dependencies {
     implementation 'io.reactivex:rxandroid:1.2.1'
     implementation 'com.github.campusappcn.AndRouter:router:1.2.8'
     implementation project(path: ':collie')
-//      implementation 'io.github.happylishang:collie:1.1.3'
-    annotationProcessor 'com.github.campusappcn.AndRouter:compiler:1.2.8'
+      implementation 'io.github.happylishang:collie:1.1.8'
+//    annotationProcessor 'com.github.campusappcn.AndRouter:compiler:1.2.8'
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
