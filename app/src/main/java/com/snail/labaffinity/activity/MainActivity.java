@@ -5,6 +5,7 @@ import static com.snail.labaffinity.app.LabApplication.sLaunchCost;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
@@ -27,9 +28,6 @@ public class MainActivity extends BaseActivity {
 
         mResultProfileBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mResultProfileBinding.getRoot());
-
-
-        mResultProfileBinding.contentMain1.appStart.setText("冷启动耗时" +sLaunchCost);
         mResultProfileBinding.contentMain1.activityStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,4 +71,13 @@ public class MainActivity extends BaseActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        new Handler().postDelayed((Runnable) () -> {
+            mResultProfileBinding.contentMain1.appStart.setText("冷启动耗时" + sLaunchCost);
+        }, 300);
+
+    }
 }
