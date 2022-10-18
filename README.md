@@ -2,7 +2,7 @@
 
 轻量级Android性能监测工具
 
-* FPS监测:  利用Looper的printLoop来实现
+* FPS监测及卡顿监测:  利用Looper的printLoop来实现
 * 流量监测： Trafficstats
 * 耗电 ：Battery BroadCast 似乎意义不是特别大
 * 内存占用：Debug
